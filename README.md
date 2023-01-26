@@ -84,6 +84,7 @@
 
 ### 집계 공식
 
+* SCORE : 종합적인 점수값
 * V : view
 * L : listen
 * P : view-listen-per (listen / view)

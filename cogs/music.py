@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import lavalink
 import re
-from lavalink.filters import Karaoke, Timescale, Tremolo, Vibrato, Rotation, LowPass, ChannelMix, Volume
+# from lavalink.filters import Karaoke, Timescale, Tremolo, Vibrato, Rotation, LowPass, ChannelMix, Volume
 import config
 url_rx = re.compile(r'https?://(?:www\.)?.+')
 

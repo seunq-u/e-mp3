@@ -6,11 +6,16 @@
 
 ## TODO
 
-* [ ] : 집계 view listen 일일, 월간, 주간 방식 고민하기
+* [x] : 집계 view listen 일일, 월간, 주간 방식 고민하기
+* [ ] : json 데이터 형식 지정
+* [ ] : 하트를 유튜브 좋아요 처럼(일일/주간/실시간 인기 방식 고안) 1번만 or 12시간에 한번 투표 같은 형식(어뷰징 가능성⇑..) or 기타 방법 고안해보기.. -> 차라리 그냥 플리를 장르별로 검색/추천, 시청횟수랑 추천알고리즘 기반으로?
 
 ## DEV ROAD MAP
 
 .**위 부터 순서대로 구현**
+
+* 유틸리티 라이브러리
+    * [x] : logger
 
 1. 약관 동의/철회
     * [ ] : 약관 검사 모듈 구현 (utils.utilbox)
@@ -173,9 +178,11 @@ $${Score} = (0.8{V}+L)\frac{L}{V} + 0.75{H} $$
     {
         "name" : "<플리 이름>",
         "description" : "<플리 성명>",
+        "using_custom_cover_img" : "<커스텀 커버 이미지 사용여부(True/False)>",
+        "cover_img" : "<플리 커버 이미지 파일명(userID_playlist_uuid)> 또는 기본 커버 이름(default_<number>)>", 
         "playlist_uuid" : "<플리 고유 ID>",
         "owner_id" : "<소유자(유저) 디스코드 고유 ID>",
-        "visibility" : "<공개여부|0:비공개/1:공개)",
+        "visibility" : "<공개여부|False:비공개/True:공개)",
         "first_date" : "<플리 최초 작성 날짜 및 시간>",
         "last_date" : "<플리 최종 수정 날짜 및 시간>",
         "music" : [
@@ -185,25 +192,40 @@ $${Score} = (0.8{V}+L)\frac{L}{V} + 0.75{H} $$
                 "time" : "<음악의 총 길이>",
                 "author" : "<제작자>",
                 "author_link" : "<제작자 url>",
-                "thumbnail" : "<미리보기 이미지 url>"
+                "thumbnail" : "<미리보기 이미지 url>",
+                "pos" : "위치",
             }
         ],
         "heart" : {
             "today" : 0,  // 당일 받은 하트 수
             "last" : [
-                {"년.월.일.시간.분.초.요일" : 0} // `년.월.일.시간.분.초.요일` 에 받은 하트 수
+                {"2023.1.1" : 0} // `년.월.일` 에 받은 하트 수
             ],
+            // 아래 두 항목은 집계시 초기화 후 last 를 이용해 계산
             "week" : 0, // 주간 인기 (7일 기준)
             "month" : 0, // 월간 인기 (31일 기준)
         },
-        "view" : 0, // 본 횟수 / 1시간 기준으로 +1 (집계에 X)
-        "view_one_hour_user" : [
-            // user_id : time.time()
-        ], // 최근 본 유저의 데이터 저장, time.time() 시간 기준, 다시 보거나 1시간 단위로 비동기 자동 정리
-        "listen" : 0, // 청취 횟수 (1곡의 1/2 이상 청취시 카운트 +1) / 당일에는 최대 6회까지만
-        "listen_today_user" : [
-            // user_id : count
-        ] // 유저가 본횟수 측정, 집계시간에 초기화
+        "view" : {
+            "today" : 0, // 당일 본 조회수 / 1시간 기준으로 +1
+            "view_one_hour_user" : [
+                // user_id : time.time()
+            ], // 최근 본 유저를 1시간 동안 저장, 만약 그 유저가 1시간이 지난후에 다시 보면 그 시간으로 변경, time.time() 시간 기준, 
+            "last" : [
+                {"2023.1.1" : 0} // `년.월.일` 에 받은 하트 수
+            ],
+            // 아래 두 항목은 집계시 초기화 후 last 를 이용해 계산
+            "week" : 0, // 주간 조회수 (7일 기준)
+            "month" : 0, // 월간 조회수 (31일 기준)
+        },
+        "listen" : {
+            "today" : 0, // 청취 횟수 (1곡의 1/2 이상 청취시 카운트 +1) / 당일에는 최대 6회까지만
+            "listen_today_user" : [
+                // user_id : count
+            ],
+            // 아래 두 항목은 집계시 초기화 후 last 를 이용해 계산
+            "week" : 0, // 주간 청자 (7일 기준)
+            "month" : 0, // 월간 청자 (31일 기준)
+        }
     }
     ```
 
@@ -212,14 +234,23 @@ $${Score} = (0.8{V}+L)\frac{L}{V} + 0.75{H} $$
     ```json
     {
         "user_id" : "<소유자(유저) 디스코드 고유 ID>",
-        "heart_point": 0, // 한디리 하트 포인트
+        "nickname" : "플리 공유상의 닉네임",
+        "kdbl_point": 0, // 한디리(Korean discrod bot list) 하트 포인트
+        "terms" : {
+            "policy_privacy" : false, // 개인정보 처리방침 동의 여부
+            "terms_of_service" : false, // 이용약관(tos) 동의 여부
+            "marketing_consent" : false, // 광고성 정보 수신 동의 여부
+        },
         "BeDeleted" : [ // 삭제 예정 플리
             // {"date" : "uuid"} 
         ], 
         "playlist" : [
             "uuid", // playlist uuid
             "uuid",
-        ]
+        ],
+        "bookmark" : [
+            "uuid" // playlist uuid
+        ] // 즐겨찾기
     }
     ```
 

@@ -78,11 +78,7 @@ logs/
 lavalink_logs/
 
 # 개인정보
-DB/user/*
-DB/backup/playlist/*
-DB/backup/user/*
-DB/playlist/*
-DB/setting/total.json
+
 
 # Image
 *.clip

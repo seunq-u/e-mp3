@@ -17,10 +17,12 @@ import typing
 # <<<--- system --->>>
 
 class System:
+    @staticmethod
     def sum_total() -> None:
         """- 토탈 데이터 집계"""
         pass
 
+    @staticmethod
     def get_all_playlist_heart() -> dict:
         """
         - 모든(visibility 한정) 플리의 하트 데이터 수집\n
@@ -33,6 +35,7 @@ class System:
         """
         pass
 
+    @staticmethod
     def get_all_playlist_heart_live() -> list:
         """
         - 모든(visibility 한정) 플리의 현재 하트수(today) 집계\n
@@ -45,6 +48,7 @@ class System:
         """
         pass
 
+    @staticmethod
     def count_all_playlist_heart() -> None:
         """
         - 모든 플리의 하트 데이터 집계
@@ -55,22 +59,28 @@ class System:
 
     class Data:
         """- 데이터 관리 함수 모음"""
+
+        @staticmethod
         def open_data(path: str) -> dict:
             """- path에서 데이터 오픈"""
             print(path)
 
+        @staticmethod
         def edit_data(path: str, data: any) -> None:
             """- path의 데이터 수정"""
             pass
 
+        @staticmethod
         def create_data(path: str, name: str, data: any) -> None:
             """- path 에서 data를 가지고 있는 {name}.json 생성"""
             pass
 
+        @staticmethod
         def check_data(path: str, name: str) -> bool:
             """- path 에 name.json 이 있는지 확인"""
             pass
 
+        @staticmethod
         def get_playlist_heart(playlist_uuid: str) -> None:
             """- playlist_uuid 에 해당하는 플리의 하트 데이터 수집"""
             pass
@@ -79,10 +89,12 @@ class System:
 # <<--- user --->>
 
 class User:
+    @staticmethod
     def add_playlist(playlist_uuid: str) -> None:
         """- 유저 데이터에 플리 추가"""
         pass
 
+    @staticmethod
     def remove_playlist(playlist_uuid: str) -> None:
         """
         - 유저 데이터에 플리 제거
@@ -92,14 +104,17 @@ class User:
         # Playlist.remove(playlist_id)
         pass
 
+    @staticmethod
     def new(user_id: int) -> None:
         """- 유저 추가"""
         pass
 
+    @staticmethod
     def check_heart(user_id: int) -> bool:
         """- 유저가 한디리 하트를 눌렀나 확인"""
         pass
 
+    @staticmethod
     def remove_all(user_id: int) -> None:
         """- 유저 데이터 전체 삭제"""
         pass
@@ -107,6 +122,7 @@ class User:
 # <<--- playlist --->>>
 
 class Playlist:
+    @staticmethod
     def remove(playlist_uuid: str) -> None:
         """
         - DB/playlist 에서 삭제
@@ -115,18 +131,22 @@ class Playlist:
         """
         pass
 
+    @staticmethod
     def new_uuid() -> str:
         """- 새 UUID 생성"""
         return str(uuid.uuid4())
 
+    @staticmethod
     def create(user_id: int, name: str, description: str, visibility: int) -> None:
         """- 플리 생성"""
         pass
 
+    @staticmethod
     def add_heart(playlist_uuid: str) -> None:
         """- 하트 추가"""
         pass
-    
+
+    @staticmethod
     def change_visibility(playlist_uuid: str, value: int) -> None:
         """- 플리 공개여부 변경"""
         pass
@@ -134,13 +154,16 @@ class Playlist:
 
     class Music:
         """- 플리 """
-        def add(playlist_uuid: str, pos: int, title: str, link: str, time: str, author: str, author_link: str, thumbnail: str) -> None:
-            """- 플리에 음악 추가"""
-            pass
 
-        def delete(playlist_uuid: str, pos: int, link: str) -> any:
-            """- 플리에서 음악 삭제"""
-            pass
+    @staticmethod
+    def add(playlist_uuid: str, pos: int, title: str, link: str, time: str, author: str, author_link: str, thumbnail: str) -> None:
+        """- 플리에 음악 추가"""
+        pass
+
+    @staticmethod
+    def delete(playlist_uuid: str, pos: int, link: str) -> any:
+        """- 플리에서 음악 삭제"""
+        pass
 
 
 class ErrorCode:

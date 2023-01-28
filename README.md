@@ -1,3 +1,9 @@
+<div align="center">
+
+![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=Discord&logoColor=white)
+![Python311](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=Python&logoColor=white)
+</div>
+
 # Every-Mp3
 
 1. 플리를 만들어 공유 하거나 개인이 듣기

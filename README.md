@@ -1,7 +1,10 @@
 <div align="center">
-
-![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=Discord&logoColor=white)
-![Python311](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=Python&logoColor=white)
+    <a href="https://discord.com/developers/docs/intro">
+        <img src="https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=Discord&logoColor=white"/>
+    </a>
+    <a href="http://python.org">
+        <img src="https://img.shields.io/badge/Python 3.11-3776AB?style=flat-square&logo=Python&logoColor=white"/>
+    </a>
 </div>
 
 # Every-Mp3

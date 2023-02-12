@@ -21,7 +21,7 @@
     -> 일일/주간/월간의 주목적은 기일내 인기가 상승중인 플리를 표시하기 위함
     -> 집계 공식은 X
 * [ ] : json 데이터 형식 지정
-* [ ] : 플리가 공개 <-> 비공개인 경우 어떻게 할까..?
+* [x] : 플리가 공개 <-> 비공개인 경우 어떻게 할까..? -> 공개 -> 비공개인 경우 금일에는 집계하고, 다음날 부턴 집계 하지 않음, 비공개 -> 공개인 경우에는 똑같이 집계함
 
 ## DEV ROAD MAP
 
@@ -129,7 +129,7 @@
 
 플리 재생중에는 아래에 `중단`, `건너뛰기`, `점프`, `하트`, `저장하기`, `종료` 와 같은 버튼 표시  
 
-## 데이터 저장
+## 데이터 저장 (DataManager)
 
 플리 데이터와 유저 데이터를 구분하여 저장하고,  
 플리에는 각각의 고유 번호를 부여하여  
@@ -137,35 +137,69 @@
 
 * 날자 및 시간의 표기는 `년.월.일.시간.분.초` 또는 `년.월.일` 로 저장함
 
+### DataManager
+
+#### Instruction
+
+* user
+    생성: create, 삭제: delete, 수정: alter
+    1. create_account : 유저 가입
+    2. delete_account : 유저 탈퇴
+    3. alter_nickname : 닉네임 변경
+    4. add_kdbl_point : 한디리 하트 포인트 추가
+    5. alter_terms_pp : 개인정보 처리방침 동의 여부 수정
+    6. alter_terms_tos : 이용약관 동의 여부 수정
+    7. alter_trems_mc : 광고성 정보 수신 동의 여부 수정
+    8. add_playlist : 플리 추가
+    9. delete_playlist : 플리 삭제
+    10. add_bookmark : 북마크 추가
+    11. delete_bookmark : 북마크 삭제
+
+* playlist  
+    생성: create, 삭제: remove, 수정: alter
+    1. create_playlist : 플리 생성
+    2. remove_playlist : 플리 삭제
+    3. alter_name : 이름 수정
+    4. alter_description : 설명 수정
+    5. alter_using_custom_cover_img : 커스텀 이미지 사용여부 수정
+    6. alter_cover_img : 커버 이미지 수정
+    7. alter_visibility : 공개여부 수정
+    8. add_music : 음악 추가
+    9. remove_music : 음악 삭제
+    10. add_heart : 하트 추가
+
 ### 플리 집계 및 저장
 
 1. 집계의 기준
     * 플리는 매일 자정(00:00 ~ 00:10±a)에 집계함  
     * 집계는 봇 시스템 내부에 비동기 클래스로 봇이 시작될 때 self.bot 변수에 포함함. (시작시 시간을 확인하고 자정까지 시간(-1분)을 계산해 wait, 1분 전부터는 초단위로 wait함)
-    * 집계중에는 PICK을 확인할 수 없으며, PICK 및 추천 플리의 하트추가 와 같은 기능을 이용할 수 없음  
-    * 따라서 `/플리 PICK`, `/플리 하트` 은 사용시 불가 메세지, `/플리` 는 위는 불가, 이번달의 추천 플리만 표시하고 기타 하트가 표시되는 기능에는 전부 `집계중..`이라 표시함  
-    * 사용이 가능한 명령어는 `/도움말`, `/가입`, `/탈퇴` 임
+    * `/도움말` 명령어를 제외한 **모든 명령어는 사용이 불가**
+    * visibility_playlist.json 에 public 인 데이터만 집계
 
 2. 플리의 집계
     * 하트는 today(Integer) 와 last(Obj) 그리고 all(Integer)의 세 변수로 플리 데이터 내부에 저장함
     1. last.update({"년.월.일" : today})
     2. all += today
     3. today = 0
-    4. week = last[:8] (단 1번 작업이 된 last 기준.)
-    5. month = last[:31] (단 1번 작업이 된 last 기준.)
-    6. total
+    4. week = last[:7] (최근 7일) (단 1번 작업이 된 last 기준.)
+    5. month = last[:30] (최근 30일) (단 1번 작업이 된 last 기준.)
+    6. all 집계
 
 3. 비공개/공개 여부가 바뀐 플리의 집계
-    * 공개 -> 비공개 플리도 함께 집계함
-        * 오전에 하트를 받고, 오후에 소유자가 비공개로 바꿀 수도 있기 때문에
+    * 공개 -> 비공개 플리
+        (visibility_playlist.json[public_to_private] 에 있는 플리들)  
+       -> 집계후 public_to_private 에서 삭제
+
+    * 비공개 -> 공개 플리
+        X 그냥 일반대로 집계
 
 4. 랭킹 집계
-    1. 모든 플리의 day, week, month, all 집계하여 순서를 매김
+    1. 모든 플리의 day, week, month, all 집계하여 순서를 매김 (total_(day/week/month/all).json)
     2. 일일 PICK 초기화 후 집계(전날기준)
 
-<!-- 
-5. 당일 플리의 공개여부(visibility)가 바뀌었을 경우
-    * 해당일에는 week, month 를 집계하지 않음 -->
+5. 삭제 예정인 플리
+   1. BeDeleted.json 에서 BeDeleted 값을 모두 확인하며 date 가 오늘 날짜 (date-type2) 와 같으면 삭제
+   2. 그후 playlist에도 uuid 제거
 
 ### 플리의 저장 및 백업
 
@@ -176,17 +210,16 @@
     * 플리에 음악 저장시 `제목`, `영상 url`, `시간`, `제작자`, `제작자 채널 url`, `미리보기 이미지 url` 등을 저장함  
 
 2. 플리의 백업  
-    * 플리는 하트수 집계시간마다 백업되며 최대 1주일 까지 백업됨  
+    * 플리는 매일 집계시간마다 백업되며 최대 1주일 까지 백업됨  
     * 유저가 플리 삭제 요청시 최대 1주일 까지 백업
 
 ### 플리의 비공개 <-> 공개
 
 1. 플리가 비공개 -> 공개인 경우
-    <!-- * 그 다음 날 집계중에 플리 데이터 앞에 public_ 명칭을 붙침 -->
-    <!-- * 해당일에는 노출되지 않음 -->
+    visibility_playlist.json[private_to_public] 에 추가함
 
 2. 플리가 공개 -> 비공개인 경우
-    * 플리는 ?
+    visibility_playlist.json[public_to_private] 에 추가함
 
 ### Json 형식
 
@@ -203,8 +236,8 @@
         "playlist_uuid" : "<플리 고유 ID>",
         "owner_id" : "<소유자(유저) 디스코드 고유 ID>",
         "visibility" : "<공개여부|False:비공개/True:공개)",
-        "first_date" : "<플리 최초 작성 날짜 및 시간>",
-        "last_date" : "<플리 최종 수정 날짜 및 시간>",
+        "first_date" : "<플리 최초 작성 날짜 및 시간 date-type4>",
+        "last_date" : "<플리 최종 수정 날짜 및 시간 date-type4>",
         "music" : [
             {
                 "title" : "<음악의 제목>",
@@ -213,13 +246,12 @@
                 "author" : "<제작자>",
                 "author_link" : "<제작자 url>",
                 "thumbnail" : "<미리보기 이미지 url>",
-                "pos" : "위치",
             }
         ],
         "heart" : {
             "today" : 0,  // 당일 받은 하트 수
             "last" : [
-                {"2023.1.1" : 0} // `년.월.일` 에 받은 하트 수
+                {"date-type2" : 0} // `년/월/일`(date-type2) 에 받은 하트 수
             ],
             // 아래 두 항목은 집계시 초기화 후 last 를 이용해 계산
             "week" : 0, // 주간 인기 (7일 기준)
@@ -241,9 +273,6 @@
             "terms_of_service" : false, // 이용약관(tos) 동의 여부
             "marketing_consent" : false, // 광고성 정보 수신 동의 여부
         },
-        "BeDeleted" : [ // 삭제 예정 플리
-            // {"date" : "uuid"} 
-        ], 
         "playlist" : [
             "uuid", // playlist uuid
             "uuid",
@@ -251,16 +280,13 @@
         "bookmark" : [
             "uuid" // playlist uuid
         ], // 즐겨찾기
-        "cloned" : [
-            "c_uuid-(user_id)"
-        ]
     }
     ```
 
 3. 집계 데이터 (total_(day/week/month/all).json)
 
-각 total_day.json / total_week.json / total_month.json / total_all.json 으로 존재함.  
-처음에는 is_sort 상태가 아닌 상태로 저장하고(또는 메모리상으로 바로) 각각 4개를 쓰레드로 순위를 매겨 저장
+    각 total_day.json / total_week.json / total_month.json / total_all.json 으로 존재함.  
+    처음에는 is_sort 상태가 아닌 상태로 저장하고(또는 메모리상으로 바로) 각각 4개를 쓰레드로 순위를 매겨 저장
 
     ```json
     {
@@ -271,8 +297,32 @@
     }
     ```
 
+4. 플리의 공개/비공개 데이터 (visibility_playlist.json)
+
+    ```json
+    {
+        "public" : ["uuid" ... "uuid"],
+        "public_to_private" : ["uuid" ... "uuid"],
+        // "private_to_public" : ["uuid" ... "uuid"] 은 없고 바뀌면 바로 public 에 추가됨
+    }
+    ```
+
+5. 삭제 예정 플리 데이터 (BeDeleted.json)
+
+    ```json
+    {
+        "BeDeleted" : {
+            "user_id(int)" : { 
+                "date" : "요청일 기준 + 7일(date-type2)",
+                "playlist" : "uuid"
+            }
+        },
+        "playlist" : ["uuid", ...] // 삭제 예정인 플리
+    }
+    ```
+
 <!-- 
-4. 일반 데이터 (data.json)
+1. 일반 데이터 (data.json)
 
 플리의 비공개/공개가 바뀌었거나 기타 등등 해당 집계시간에 한번 실행해야 하는 것들
 
@@ -284,6 +334,14 @@
         }
     }
     ``` -->
+
+### 기타 데이터 형식
+
+1. 시간 타입 (date type)
+    1. type1 : 유닉스 타임스탬프
+    2. type2 : 년/월/일
+    3. type3 : 시.분.초
+    4. type4 : 년/월/일-시.분.초
 
 ## 추후 업데이트로 할만한 아이디어.zip ..?
 

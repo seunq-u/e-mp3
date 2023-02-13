@@ -1,4 +1,4 @@
-from lib.classes.FileIO import FileIO
+from FileIO import FileIO
 
 
 class UserInstruction(FileIO):
@@ -7,11 +7,11 @@ class UserInstruction(FileIO):
     def __init__(self) -> None:
         pass
 
-    def create_account(self, ):
+    def create_account(self, data: dict):
         # 실제로 json 에 접근하는 구문들
         pass
 
-    def delete_account(self, ):
+    def delete_account(self, data: dict):
         pass
 
     def alter_nickname(self, ):
@@ -87,9 +87,18 @@ class CreateInstruction():
 
     # <<<--- user --->>>
 
-    def create_account(self, ):
+    def create_account(self, user_id: int, nickname: str, terms: tuple[bool, bool, bool]):
         # 리턴으로 dict 형 data가 나옴
-        pass
+        data = {
+            "user_id" : user_id,
+            "nickname" : nickname,
+            "terms" : {
+                "policy_privacy" : terms[0],
+                "terms_of_service" : terms[1],
+                "marketing_consent" : terms[2]
+            }
+        }
+        return data
 
     def delete_account(self, ):
         pass

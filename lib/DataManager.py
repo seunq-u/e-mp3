@@ -6,6 +6,7 @@
 
 ###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
 """
+
 import dataclasses
 import copy
 import time
@@ -14,13 +15,13 @@ import ujson
 import multiprocessing
 from multipledispatch import dispatch
 from queue import Queue
-from lib.classes import Instruction
+
+from Instruction import *
 
 
 
 
-
-class DataManager(Instruction.UserInstruction, Instruction.PlaylistInstruction):
+class DataManager(UserInstruction, PlaylistInstruction):
     _instance = None
     _isin = False
     def __init__(self) -> None:
@@ -69,6 +70,7 @@ class DataManager(Instruction.UserInstruction, Instruction.PlaylistInstruction):
         dType = self._getDType(id)
         
         self.add_checker(data=data) # 체커 추가
+
         if self.isDict(id):
             print("in")
             self.__DATA[dType][id].put(data)

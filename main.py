@@ -17,10 +17,10 @@ import lavalink
 import time
 from lib import playlist
 
+print('waiting lavalink be started')
 DIR = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))
 os.system("start lavalink.bat")
 time.sleep(5)
-print('waiting lavalink be started')
 
 # <<--- Auto Logger --->>
 auto_logger = logging.getLogger()

@@ -1,17 +1,45 @@
-<div align="center">
-    <a href="https://discord.com/developers/docs/intro">
-        <img src="https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=Discord&logoColor=white"/>
-    </a>
-    <a href="http://python.org">
-        <img src="https://img.shields.io/badge/Python 3.11-3776AB?style=flat-square&logo=Python&logoColor=white"/>
-    </a>
-</div>
-
 # Every-Mp3
 
-1. 플리를 만들어 공유 하거나 개인이 듣기
-2. 공유된 플리에는 좋아요, 구독 등이 가능함
-3. 플리는 봇으로 재생이 가능함 정도
+<!DOCTYPE html>
+<html lang="ko">
+    <style>
+        #Profile {
+            border-radius: 25%;
+            object-fit: cover;
+            width: 80%;
+            height: 80%;
+            aspect-ratio: 1;
+            box-shadow: 0px 0px 15px #a8a39c;
+        }
+        #im {
+            border-radius: 5%;
+            object-fit: cover;
+        }
+    }
+    </style>
+    <body>
+        <div align="center">
+            <a href="https://discord.com/developers/docs/intro">
+                <img id="im" src="https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=Discord&logoColor=white"/>
+            </a>
+            <a href="http://python.org">
+                <img id="im" src="https://img.shields.io/badge/Python 3.11-3776AB?style=flat-square&logo=Python&logoColor=white"/>
+            </a>
+            <img id="Profile" src="DB/image/e-mp3-bot-full-profile.png">
+            <br></br>
+            <br></br>
+        </div>
+    </body>
+</html>
+
+## 간단한 설명
+
+🗓️ 매달 업데이트 되는 플리와 여러분만의 소중한 💝 플리를  
+공유하거나 재생 할 수 있는 봇 이에요! 🎵  
+🚠[튜토리얼](<https://docs.e-mp3.kro.kr/>) 시작하기!  
+
+📸profile image by [Midjourney](<https://midjourney.com/>)  
+ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.  
 
 ## TODO
 

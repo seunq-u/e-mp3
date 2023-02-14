@@ -16,7 +16,7 @@ import multiprocessing
 from multipledispatch import dispatch
 from queue import Queue
 
-from Instruction import *
+from lib.Instruction import *
 
 
 

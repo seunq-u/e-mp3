@@ -2,21 +2,6 @@
 
 <!DOCTYPE html>
 <html lang="ko">
-    <style>
-        #Profile {
-            border-radius: 25%;
-            object-fit: cover;
-            width: 80%;
-            height: 80%;
-            aspect-ratio: 1;
-            box-shadow: 0px 0px 15px #a8a39c;
-        }
-        #im {
-            border-radius: 5%;
-            object-fit: cover;
-        }
-    }
-    </style>
     <body>
         <div align="center">
             <a href="https://discord.com/developers/docs/intro">
@@ -25,10 +10,25 @@
             <a href="http://python.org">
                 <img id="im" src="https://img.shields.io/badge/Python 3.11-3776AB?style=flat-square&logo=Python&logoColor=white"/>
             </a>
+            <br></br>
             <img id="Profile" src="DB/image/e-mp3-bot-full-profile.png">
             <br></br>
             <br></br>
         </div>
+        <style>
+            #Profile {
+                border-radius: 25%;
+                object-fit: cover;
+                width: 80%;
+                height: 80%;
+                aspect-ratio: 1;
+                box-shadow: 0px 0px 15px #a8a39c;
+            }
+            #im {
+                border-radius: 5%;
+                object-fit: cover;
+            }
+        </style>
     </body>
 </html>
 

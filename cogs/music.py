@@ -1,3 +1,4 @@
+import typing
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -7,50 +8,44 @@ import re
 import config
 url_rx = re.compile(r'https?://(?:www\.)?.+')
 
-async def command_before_invoke(self, interaction: discord.Interaction): # 명령어가 실행되기 전 실행되야 하는 명령어
+async def command_before_invoke(self, interaction: discord.Interaction) -> bool: # 명령어가 실행되기 전 실행되야 하는 명령어
     """- Command before-invoke handler. (핸들러를 호출하기전 실행하는 명령어)"""
+    # DM 이 아닌지 확인
     guild_check = interaction.guild is not None
     # print(dir(ctx.user.voice.channel), ctx.user.voice.channel)
     #  This is essentially the same as `@commands.guild_only()`
     #  except it saves us repeating ourselves (and also a few lines).
+    # 응답 지연 -> 보낼려면 await interaction.followup.send() 를 사용
+    await interaction.response.defer()
 
     if guild_check:
-        await ensure_voice(self, interaction) # ensure_voice 호출
+        ensure = await ensure_voice(self, interaction) # ensure_voice 호출
         #  유저가 봇과 같은 채널에 있는지 확인해줌
 
-    return guild_check
+    return ensure
 
 
-async def ensure_voice(self, interaction: discord.Interaction): # 에러 방지
+async def ensure_voice(self, interaction: discord.Interaction) -> bool: # 에러 방지
     """ 봇의 권한과, 유저가 봇과 같은 음성채널에 있는지 확인 하는 함수"""
     player = self.bot.lavalink.player_manager.create(interaction.guild.id) #, endpoint=str(ctx.guild.region))
     should_connect = interaction.command.name in ('재생', '연결', ) # 자동 연결 + 연결해야 해야 작동하는 명령어
     free_commands = interaction.command.name in ( '도움말', ) # 연결 여부없이 작동하는 명령어
 
     if free_commands is True:
-        return
+        return True
 
+    # 음성채널에 유저가 존재하는지 확인
     if not interaction.user.voice or not interaction.user.voice.channel:
-        return await interaction.response.send_message("`❗ 먼저 음성채널에 들어가야 이 명령어를 사용할 수 있어요!`", ephemeral=True)
-        # raise commands.CommandInvokeError('Join a voicechannel first.')
+        await interaction.followup.send("`❗ 먼저 음성채널에 들어가야 이 명령어를 사용할 수 있어요!`", ephemeral=True)
+        return False
 
-    if not player.is_connected: # VC 와 연결이 안될경우
+    # 음성채널과 봇(재생 player)이 연결안된 경우
+    if not player.is_connected:
         if not should_connect: # should connect가 아닐경우
-            return await interaction.response.send_message("`❗ 연결된 채널이 없어요..`", ephemeral=True)
-            # raise commands.CommandInvokeError('Not connected.')
+            await interaction.followup.send("`❗ 연결된 채널이 없어요..`", ephemeral=True)
+            return False
 
-        # permissions = interaction.user.voice.channel.permissions_for(interaction.guild.get_member(config.ID))
-        # print(permissions)
-
-        # if not permissions.connect:  # Check user limit too?
-        #     return await interaction.response.send_message("`❗ 연결할 채널에 제가 연결(CONNECT)할 권한이 없어요..`")
-        #     # raise commands.CommandInvokeError('I need the `CONNECT` permissions.')
-
-        # elif not permissions.speak:
-        #     await interaction.response.send_message("`❗ 음성채널에서 말하기(SPEAK) 권한이 없어요..`")
-        #     # raise commands.CommandInvokeError('I need the `SPEAK` permissions.')
-
-        player.store('channel', interaction.channel.id)
+        player.store('text_channel_id', interaction.channel.id)
         try:
             await interaction.user.voice.channel.connect(cls=LavalinkVoiceClient, self_deaf=True)
         except Exception as e:
@@ -58,13 +53,17 @@ async def ensure_voice(self, interaction: discord.Interaction): # 에러 방지
                 await interaction.guild.voice_client.disconnect(force=True)
                 await interaction.user.voice.channel.connect(cls=LavalinkVoiceClient, self_deaf=True)
             except Exception as e:
-                await interaction.response.send_message("`❗ 연결중에 에러가 발생했어요..`")
+                print(e)
+                await interaction.followup.send("`❗ 연결중에 에러가 발생했어요..`")
+                return False
 
-    else: # VC 와 연결된 경우
+    # 음성채널과 봇이 연결된 경우
+    else:
         if int(player.channel_id) != interaction.user.voice.channel.id:
-            return await interaction.response.send_message("`❗ 제가 연결된 음성 채널에서 명령어를 사용해주세요!`", ephemeral=True)
-            # raise commands.CommandInvokeError('You need to be in my voicechannel.')
+            await interaction.followup.send("`❗ 제가 연결된 음성 채널에서 명령어를 사용해주세요!`", ephemeral=True)
+            return False
 
+    return True
 
 class LavalinkVoiceClient(discord.VoiceClient):
     def __init__(self, client: discord.Client, channel: discord.abc.Connectable):
@@ -108,7 +107,6 @@ class LavalinkVoiceClient(discord.VoiceClient):
         봇을 음성 채널에 연결하고 player_manager가 아직 없는 경우 player_manager를 만듬
         """
         # 새로운 voice client 생성시 player_manager가 존재하는지 확인
-        self.lavalink.player_manager.create(guild_id=self.channel.guild.id)
         await self.channel.guild.change_voice_state(channel=self.channel, self_mute=self_mute, self_deaf=self_deaf)
 
     async def disconnect(self, *, force: bool = False) -> None:
@@ -169,7 +167,6 @@ class Music(commands.Cog):
     async def on_ready(self):
         print(f"{__name__} loaded successfully!")
 
-
     def cog_unload(self):
         """- 코그 언로드 핸들러. 코그가 언로드 되면 모든 이벤트 후크 제거."""
         self.bot.lavalink._event_hooks.clear()
@@ -189,39 +186,37 @@ class Music(commands.Cog):
 
 
 
-    @app_commands.command(name="재생", description="🎵 음악을 재생해요!")
+    @app_commands.command(name="재생", description="🎵 음악을 재생해요!", nsfw=False)
     @app_commands.describe(query='📜 음악 이름을 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def play(self, interaction: discord.Interaction, query: str):
         """ Searches and plays a song from a given query. """
-        await command_before_invoke(self=self, interaction=interaction)
-        # 
-        await interaction.response.defer()
-        
-        # Get the player for this guild from cache.
+        if not await command_before_invoke(self=self, interaction=interaction):
+            return None
+
+        # 캐시로부터 재생 플레이어 얻기
         player = self.bot.lavalink.player_manager.get(interaction.guild.id)
-        # Remove leading and trailing <>. <> may be used to suppress embedding links in Discord.
+        # < > 제거 (디스코드에서 URL 임베딩 제한용으로 쓰임)
         query = query.strip('<>')
 
-        # Check if the user input might be a URL. If it isn't, we can Lavalink do a YouTube search for it instead.
-        # SoundCloud searching is possible by prefixing "scsearch:" instead.
+        # URL 이 유튜브 링크인지 확인하고 접두사 추가 / URL 이 아니면 일반 검색
+        # SoundCloud 는 "scsearch:" 로
         if not url_rx.match(query):
             query = f'ytsearch:{query}'
 
-        # Get the results for the query from Lavalink.
+        # lavalink 요청
         results = await player.node.get_tracks(query)
 
         # Results could be None if Lavalink returns an invalid response (non-JSON/non-200 (OK)).
         # Alternatively, results.tracks could be an empty array if the query yielded no tracks.
         if not results or not results.tracks:
-            return await interaction.followup.send(content='Nothing found!')
-
+            return await interaction.followup.send(content='`❗ 검색 결과가 없어요!`')
 
         embed = discord.Embed(color=discord.Color.blurple())
 
-        # Valid loadTypes are:
-        #   TRACK_LOADED    - single video/direct URL)
-        #   PLAYLIST_LOADED - direct URL to playlist)
+        # 로드타입:
+        #   TRACK_LOADED    - single video/direct URL
+        #   PLAYLIST_LOADED - direct URL to playlist
         #   SEARCH_RESULT   - query prefixed with either ytsearch: or scsearch:.
         #   NO_MATCHES      - query yielded no results
         #   LOAD_FAILED     - most likely, the video encountered an exception during loading.
@@ -241,14 +236,56 @@ class Music(commands.Cog):
 
             player.add(requester=interaction.user.id, track=track)
 
+
         await interaction.followup.send(embed=embed)
 
 
-
-        # We don't want to call .play() if the player is playing as that will effectively skip
-        # the current track.
+        # 재생중이지 않는다면 재생 시작
         if not player.is_playing:
             await player.play()
+
+    @app_commands.command(name="연결", description="🎤 음성 채널에 연결해요!")
+    @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
+    async def 연결(self, interaction: discord.Interaction):
+        if not await command_before_invoke(self=self, interaction=interaction):
+            return None
+
+        # player = self.bot.lavalink.player_manager.get(interaction.guild.id)
+        await interaction.followup.send(f'<#{interaction.user.voice.channel.id}>에 연결했어요!')
+
+    @app_commands.command(name="연결끊기", description="❗ 음성 채널에서 나가요!")
+    @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
+    async def 연결끊기(self, interaction: discord.Interaction):
+        if not await command_before_invoke(self=self, interaction=interaction):
+            return None
+
+        player = self.bot.lavalink.player_manager.get(interaction.guild.id)
+
+        if not player.is_connected:
+            # We can't disconnect, if we're not connected.
+            return await interaction.followup.send(content="`❗ 연결된 채널이 없어요..`", ephemeral=True)
+        # print(player.channel_id, interaction.user.voice.channel.id)
+        if not interaction.user.voice or (player.is_connected and interaction.user.voice.channel.id != int(player.channel_id)):
+            # Abuse prevention. Users not in voice channels, or not in the same voice channel as the bot
+            # may not disconnect the bot.
+            return await interaction.followup.send(content="`❗ 제가 연결된 음성 채널에서 명령어를 사용해주세요!`", ephemeral=True)
+
+        # Disconnectiong
+        # Clear the queue to ensure old tracks don't start playing
+        # when someone else queues something.
+        player.queue.clear()
+        # Stop the current track so Lavalink consumes less resources.
+        await player.stop()
+        # Disconnect from the voice channel.
+        try:
+            await interaction.guild.voice_client.disconnect(force=True) # 또는 await interaction.voice_client.disconnect(force=True)
+        except AttributeError as e:
+            print(e)
+        finally:
+            player.channel_id = None
+            await interaction.followup.send('`음성채널을 나갔어요!`')
+
+        # print(f"<{interaction.user.voice.channel} | {interaction.user.voice.channel.id}> 연결 해제")
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Music(bot=bot))

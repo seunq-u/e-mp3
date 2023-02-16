@@ -195,6 +195,9 @@ class Music(commands.Cog):
     async def play(self, interaction: discord.Interaction, query: str):
         """ Searches and plays a song from a given query. """
         await command_before_invoke(self=self, interaction=interaction)
+        # 
+        await interaction.response.defer()
+        
         # Get the player for this guild from cache.
         player = self.bot.lavalink.player_manager.get(interaction.guild.id)
         # Remove leading and trailing <>. <> may be used to suppress embedding links in Discord.
@@ -211,7 +214,8 @@ class Music(commands.Cog):
         # Results could be None if Lavalink returns an invalid response (non-JSON/non-200 (OK)).
         # Alternatively, results.tracks could be an empty array if the query yielded no tracks.
         if not results or not results.tracks:
-            return await interaction.response.send_message('Nothing found!')
+            return await interaction.followup.send(content='Nothing found!')
+
 
         embed = discord.Embed(color=discord.Color.blurple())
 
@@ -237,7 +241,9 @@ class Music(commands.Cog):
 
             player.add(requester=interaction.user.id, track=track)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
+
+
 
         # We don't want to call .play() if the player is playing as that will effectively skip
         # the current track.

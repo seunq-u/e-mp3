@@ -8,6 +8,7 @@ __pycache__
 *.sh
 __pypackages__/
 .*/
+*.lnk
 
 # C extensions
 *.so

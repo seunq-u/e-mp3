@@ -21,7 +21,7 @@ class FileIO():
 
     def _check_secure_path(self, path: str, func_name: str = '???') -> bool:
         path_up = path.upper()
-        if ( path_up.startswith('DB/') or path_up.startswith('DB//') or path_up.startswith('''DB\\''') ):
+        if path_up.startswith(('DB/', 'DB//', '''DB\\''')):
             return True
         else:
             logger.error(log=f"Wrong or Disallowed Path Error : {path}", detail=f"FileIO._check_secure_path.{func_name}")
@@ -59,7 +59,7 @@ class FileIO():
 
 
     def make_json(self, path, name, data: dict = {}, detail: str = '') -> bool:
-        if path.endswith('/') or path.endswith('//') or path.endswith('''\\'''): # 제대로 path 가 제대로 된 형식인지 확인
+        if path.endswith(('/', '//', '''\\''')): # 제대로 path 가 제대로 된 형식인지 확인
             name = self._add_json_extension(name)
             path_n = path + name
 

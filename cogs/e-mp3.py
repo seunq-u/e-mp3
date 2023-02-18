@@ -1,3 +1,4 @@
+import datetime
 import typing
 import discord
 from discord.ext import commands
@@ -50,9 +51,10 @@ class e_mp3(commands.Cog):
     @app_commands.describe(extension='📜 리로드 할 Cog를 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def reload(self, interaction: discord.Interaction, extension: str):
+        start_time = datetime.datetime.now()
         if (iAd := utilbox.isAdmin(interaction)) is False:
-            await interaction.response.send_message(content=iAd)
-            return 0
+            return await interaction.response.send_message(content=iAd)
+
         try:
             if extension == "all":
                 for i in (extension := list(self.bot.cogs.keys())):
@@ -61,56 +63,64 @@ class e_mp3(commands.Cog):
             else:
                 await self.bot.reload_extension(f"cogs.{extension}")
                 print(f"Reload Cogs: cogs.{extension}.py")
-
         except Exception as e:
             try:
-                await interaction.response.send_message(content=f'`cogs.{extension}.py` 를 리로드중에 에러가 발생했어요!\n-> ```{e}```')
+                await interaction.response.send_message(content=f'`❌ cogs.{extension}.py 를 리로드중에 에러가 발생했어요.`\n-> ```{e}```')
             except discord.errors.InteractionResponded:
-                await interaction.edit_original_response(content=f'`cogs.{extension}.py` 를 리로드중에 에러가 발생했어요!\n-> ```{e}```')
+                await interaction.edit_original_response(content=f'`❌ cogs.{extension}.py 를 리로드중에 에러가 발생했어요.`\n-> ```{e}```')
             except Exception as e:
                 print(e)
         else:
-            embed = discord.Embed(title='Reload', description=f'{extension} successfully reloaded', color=0xff00c8)
+            embed = discord.Embed(title=f'{config.Emoji.okay} Reload', description=f'{extension} successfully reloaded', color=0xff00c8).add_field( 
+                    name='`⏱️ Runtime ⏱️`', 
+                    value=f'```py\n{datetime.datetime.now()-start_time}```', 
+                    inline=False)
             await interaction.response.send_message(embed=embed)
 
     @app_commands.command(description="❌ Unload Cog.")
     @app_commands.describe(extension='📜 언로드 할 Cog를 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def unload(self, interaction: discord.Interaction, extension: str):
+        start_time = datetime.datetime.now()
         if (iAd := utilbox.isAdmin(interaction)) is False:
-            await interaction.response.send_message(content=iAd)
-            return 0 
+            return await interaction.response.send_message(content=iAd)
 
         try:
             await self.bot.unload_extension(f"cogs.{extension}")
             print(f"Unload Cogs: cogs.{extension}.py")
-            embed = discord.Embed(title='Unload', description=f'{extension} successfully unload', color=0xff2626)
+            embed = discord.Embed(title=f'{config.Emoji.okay} Unload', description=f'{extension} successfully unload', color=0xff2626).add_field( 
+                    name='`⏱️ Runtime ⏱️`', 
+                    value=f'```py\n{datetime.datetime.now()-start_time}```', 
+                    inline=False)
             await interaction.response.send_message(embed=embed)
         except Exception as e:
-            await interaction.response.send_message(content=f'`cogs.{extension}.py` 를 언로드중에 에러가 발생했어요!\n-> ```{e}```')
+            await interaction.response.send_message(content=f'`❌ cogs.{extension}.py 를 언로드중에 에러가 발생했어요.`\n-> ```{e}```')
 
     @app_commands.command(description="❗ Load new Cog.")
     @app_commands.describe(extension='📜 로드 할 Cog를 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def load(self, interaction: discord.Interaction, extension: str):
+        start_time = datetime.datetime.now()
         if (iAd := utilbox.isAdmin(interaction)) is False:
-            await interaction.response.send_message(content=iAd)
-            return 0 
+            return await interaction.response.send_message(content=iAd)
 
         try:
             await self.bot.load_extension(f"cogs.{extension}")
             print(f"Load Cogs: cogs.{extension}.py")
-            embed = discord.Embed(title='Load', description=f'{extension} successfully load', color=0x26ff7a)
+            embed = discord.Embed(title=f'{config.Emoji.okay} Load', description=f'{extension} successfully load', color=0x26ff7a).add_field( 
+                    name='`⏱️ Runtime ⏱️`', 
+                    value=f'```py\n{datetime.datetime.now()-start_time}```', 
+                    inline=False)
             await interaction.response.send_message(embed=embed)
         except Exception as e:
-            await interaction.response.send_message(content=f'`cogs.{extension}.py`를 로드중에 에러가 발생했어요!\n-> ```{e}```')
+            await interaction.response.send_message(content=f'`❌ cogs.{extension}.py 를 로드중에 에러가 발생했어요.`\n-> ```{e}```')
 
     @app_commands.command(description="❗ Shutdown Bot")
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def shutdown(self, interaction: discord.Interaction):
         if (iAd := utilbox.isAdmin(interaction)) is False:
-            await interaction.response.send_message(content=iAd)
-            return 0
+            return await interaction.response.send_message(content=iAd)
+
         print(f"SlashCommand -> ShutdownBot request is received from {interaction.user}({interaction.id})")
         await interaction.response.send_message(content=f'`✔️ SHUTDOWN`')
         nodes = self.bot.lavalink.node_manager.available_nodes
@@ -124,10 +134,9 @@ class e_mp3(commands.Cog):
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def getnode(self, interaction: discord.Interaction):
         if (iAd := utilbox.isAdmin(interaction)) is False:
-            await interaction.response.send_message(content=iAd)
-            return 0
+            return await interaction.response.send_message(content=iAd)
 
-        await interaction.response.send_message("`❗ 노드의 정보를 얻고 있어요..`")
+        await interaction.response.send_message("`❗ 라바링크 노드(lavalink node)의 정보를 얻고 있어요..`")
         nodes = self.bot.lavalink.node_manager.available_nodes
         if len(nodes) == 0:
             await interaction.edit_original_response(content = f'`❌ 노드가 없어요.. - {nodes}`')

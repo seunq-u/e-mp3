@@ -21,7 +21,7 @@ class e_mp3(commands.Cog):
     @app_commands.describe(option='📜 동기화 할 서버를 선택해주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def sync(self, interaction: discord.Interaction, option: Literal['this', 'etc..', 'all'], etc: str = "*ETC에 서버 ID를 입력해 주세요!*"):
-        if (iAd := utilbox.isAdmin(interaction)) is not True:
+        if (iAd := utilbox.isAdmin(interaction)) is False:
             await interaction.response.send_message(content=iAd)
             return 0
 
@@ -50,7 +50,7 @@ class e_mp3(commands.Cog):
     @app_commands.describe(extension='📜 리로드 할 Cog를 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def reload(self, interaction: discord.Interaction, extension: str):
-        if (iAd := utilbox.isAdmin(interaction)) is not True:
+        if (iAd := utilbox.isAdmin(interaction)) is False:
             await interaction.response.send_message(content=iAd)
             return 0
         try:
@@ -77,7 +77,7 @@ class e_mp3(commands.Cog):
     @app_commands.describe(extension='📜 언로드 할 Cog를 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def unload(self, interaction: discord.Interaction, extension: str):
-        if (iAd := utilbox.isAdmin(interaction)) is not True:
+        if (iAd := utilbox.isAdmin(interaction)) is False:
             await interaction.response.send_message(content=iAd)
             return 0 
 
@@ -93,7 +93,7 @@ class e_mp3(commands.Cog):
     @app_commands.describe(extension='📜 로드 할 Cog를 입력해 주세요!')
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def load(self, interaction: discord.Interaction, extension: str):
-        if (iAd := utilbox.isAdmin(interaction)) is not True:
+        if (iAd := utilbox.isAdmin(interaction)) is False:
             await interaction.response.send_message(content=iAd)
             return 0 
 
@@ -108,7 +108,7 @@ class e_mp3(commands.Cog):
     @app_commands.command(description="❗ Shutdown Bot")
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
     async def shutdown(self, interaction: discord.Interaction):
-        if (iAd := utilbox.isAdmin(interaction)) is not True:
+        if (iAd := utilbox.isAdmin(interaction)) is False:
             await interaction.response.send_message(content=iAd)
             return 0
         print(f"SlashCommand -> ShutdownBot request is received from {interaction.user}({interaction.id})")
@@ -119,6 +119,34 @@ class e_mp3(commands.Cog):
             self.bot.lavalink.node_manager.remove_node(node=i)
             print(f'remove node - {i}')
         await self.bot.close()
+
+    @app_commands.command(description="📄 Get lavaink nodes and players info.")
+    @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
+    async def getnode(self, interaction: discord.Interaction):
+        if (iAd := utilbox.isAdmin(interaction)) is False:
+            await interaction.response.send_message(content=iAd)
+            return 0
+
+        await interaction.response.send_message("`❗ 노드의 정보를 얻고 있어요..`")
+        nodes = self.bot.lavalink.node_manager.available_nodes
+        if len(nodes) == 0:
+            await interaction.edit_original_response(content = f'`❌ 노드가 없어요.. - {nodes}`')
+        else:
+            Text = ''
+            for i in range(len(nodes)):
+                players = nodes[i].players
+                IsPlaying = list()
+                IsntPlaying = list()
+                for p in players:
+                    if p.is_playing is True:
+                        IsPlaying.append(p)
+                    else:
+                        IsntPlaying.append(p)
+                
+                Text = Text + '\n' + f'[34m{i+1}. [37m{nodes[i]} [1m->\n\t\tIs Playing [0m [34m{IsPlaying}[30m([35m{len(IsPlaying)}[30m)[0m\n\t\t[37m[1mIsn\'t Playing [0m [34m{IsntPlaying}[30m([35m{len(IsntPlaying)}[30m)[0m'
+            Text = '```ansi' + Text + '```'
+            await interaction.edit_original_response(content = f'`✔️ {len(nodes)}개의 노드를 찾았어요!`\n{Text}')
+
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -156,7 +156,54 @@ class e_mp3(commands.Cog):
             Text = '```ansi' + Text + '```'
             await interaction.edit_original_response(content = f'`✔️ {len(nodes)}개의 노드를 찾았어요!`\n{Text}')
 
+    @app_commands.command(description="📄 Get Cogs info.")
+    @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
+    async def getcog(self, interaction: discord.Interaction):
+        if (iAd := utilbox.isAdmin(interaction)) is False:
+            return await interaction.response.send_message(content=iAd)
 
+        await interaction.response.send_message("`❗ 코그(cog)의 정보를 얻고 있어요..`")
+
+
+        config_cog = config.COGS
+        cog = list(self.bot.cogs)
+        cog_status = [0, 0, 0]
+        text = ''
+        is_okayed = list()
+
+        if len(cog) < len(config_cog):
+            for i in range(len(config_cog)-len(cog)):
+                cog.append(None)
+        elif len(cog) > len(config_cog):
+            for i in range(len(cog)-len(config_cog)):
+                config_cog.append(None)
+
+        for i in range(len(config_cog)):
+            if (cog[i] in config_cog) and (cog[i] is not None) and (cog[i] not in is_okayed):
+                text = text + f'`✅ {i+1}. {cog[i]}`\n'
+                cog_status[0] += 1
+                is_okayed.append(cog[i])
+
+            else:
+                for j in range(len(config_cog)):
+                    if (config_cog[j] not in cog) and (config_cog[j] is not None) and (config_cog[j] not in is_okayed):
+                        text = text + f'`❌ {i+1}. {config_cog[j]}`\n'
+                        cog_status[1] += 1
+                        is_okayed.append(config_cog[j])
+
+                    elif (cog[i] is not None) and (cog[i] not in is_okayed):
+                        text = text + f'`🤔 {i+1}. {cog[i]}`\n'
+                        cog_status[2] += 1
+                        is_okayed.append(cog[i])
+        # 해석 포기 😢 
+
+        embed = discord.Embed(title=f'📄 Cogs Status', description=f'{text}\n', color=0x26ff7a).add_field( 
+                name='`🥞 Total 🥞`', 
+                value=f'```✅: {cog_status[0]}개\n❌: {cog_status[1]}개\n🤔: {cog_status[2]}개```', 
+                inline=False)
+        embed.set_footer(text='✅ is loaded  |  ❌ is unloaded  |  🤔 is loaded but unknown')
+
+        await interaction.edit_original_response(content='`✔️ 코그 정보를 찾았어요!`', embed=embed)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(e_mp3(bot=bot))

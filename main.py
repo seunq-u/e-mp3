@@ -19,7 +19,7 @@ from lib import playlist
 
 print('waiting lavalink be started')
 DIR = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))
-os.system("start lavalink.bat")
+os.system('start "Lavalink" /min lavalink.bat')
 time.sleep(5)
 
 # <<--- Auto Logger --->>

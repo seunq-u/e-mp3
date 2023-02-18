@@ -104,16 +104,28 @@ class LavalinkVoiceClient(discord.VoiceClient):
 
     async def connect(self, *, timeout: float, reconnect: bool, self_deaf: bool = True, self_mute: bool = False) -> None:
         """
-        봇을 음성 채널에 연결하고 player_manager가 아직 없는 경우 player_manager를 만듬
+        봇을 음성채널에 연결하고, stage 인지 확인해요
         """
         # 새로운 voice client 생성시 player_manager가 존재하는지 확인
+        # player 는 ensure_voice() 에서 생성
+
+        if self.lavalink.player_manager.get(self.guild.id) is None:
+            self.lavalink.player_manager.create(self.guild.id)
+
         await self.channel.guild.change_voice_state(channel=self.channel, self_mute=self_mute, self_deaf=self_deaf)
+
+        if type(self.channel) == discord.channel.StageChannel:
+            bot_in_guild = self.guild.get_member(int(config.ID))
+            try:
+                await bot_in_guild.edit(suppress = False)
+            except Exception as e:
+                print(f'\t connect : {e}')
 
     async def disconnect(self, *, force: bool = False) -> None:
         """
         연결끊기 후 실행중인 플레이어를 정리하고 클라이언트를 종료
         """
-        player = self.lavalink.player_manager.get(self.channel.guild.id)
+        player: lavalink.DefaultPlayer = self.lavalink.player_manager.get(self.channel.guild.id)
 
         # 연결 안돼 있으면 return
         if not force and not player.is_connected:
@@ -125,9 +137,11 @@ class LavalinkVoiceClient(discord.VoiceClient):
         # update the channel_id of the player to None
         # this must be done because the on_voice_state_update that would set channel_id
         # to None doesn't get dispatched after the disconnect
-        player.channel_id = None
+        # player.channel_id = None
         await player.reset_equalizer()
         self.cleanup()
+        self.lavalink.player_manager.remove(self.channel.guild.id)
+        print('\t\t연결 끊김')
 
 class Music(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -157,15 +171,26 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        print(f"voice_state_update : {member} \n {before} \n {after}\n")
+        print(f"\n\tvoice_state_update: {member}\n {before}\n->\n {after}\n")
         try:
-            print(after.channel.members)
+            print(f" after members: len: {len(after.channel.members)} | {after.channel.members}\n\n")
         except:
-            print(before.channel.members)
+            print(f" before members: len : {len(before.channel.members)} | {before.channel.members}\n\n")
 
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{__name__} loaded successfully!")
+    
+    @commands.Cog.listener()
+    async def on_stage_instance_delete(self, stage_instance: discord.StageInstance):
+        # 만약 스테이지 채널(stage channel)에 봇이 참여한 상태에 종료될 경우 플레이어(DefaultPlayer) 파괴
+        player: lavalink.DefaultPlayer = self.bot.lavalink.player_manager.get(stage_instance.guild.id)
+        if player is not None and player.channel_id == None and player.is_connected == False:
+            await stage_instance.guild.change_voice_state(channel=None)
+            player.cleanup()
+            await player.destroy()
+            self.bot.lavalink.player_manager.remove(stage_instance.guild.id)
+
 
     def cog_unload(self):
         """- 코그 언로드 핸들러. 코그가 언로드 되면 모든 이벤트 후크 제거."""
@@ -205,12 +230,13 @@ class Music(commands.Cog):
             query = f'ytsearch:{query}'
 
         # lavalink 요청
+        
         results = await player.node.get_tracks(query)
 
         # Results could be None if Lavalink returns an invalid response (non-JSON/non-200 (OK)).
         # Alternatively, results.tracks could be an empty array if the query yielded no tracks.
         if not results or not results.tracks:
-            return await interaction.followup.send(content='`❗ 검색 결과가 없어요!`')
+            return await interaction.followup.send(content='`😭 검색 결과가 없어요.`')
 
         embed = discord.Embed(color=discord.Color.blurple())
 
@@ -250,8 +276,16 @@ class Music(commands.Cog):
         if not await command_before_invoke(self=self, interaction=interaction):
             return None
 
-        # player = self.bot.lavalink.player_manager.get(interaction.guild.id)
-        await interaction.followup.send(f'<#{interaction.user.voice.channel.id}>에 연결했어요!')
+        player: lavalink.DefaultPlayer = self.bot.lavalink.player_manager.get(interaction.guild.id)
+        if player is not None:
+            player.channel_id = interaction.user.voice.channel.id
+
+        try:
+            if player.is_connected and (type(interaction.guild.get_channel(player.channel_id)) != discord.channel.StageChannel):
+                return await interaction.followup.send(content=f"`❗`<#{interaction.user.voice.channel.id}>`에 이미 연결되어 있어요.`", ephemeral=True)
+        except Exception as e:
+            print(e)
+        await interaction.followup.send(f'<#{interaction.user.voice.channel.id}>에 연결했어요.')
 
     @app_commands.command(name="연결끊기", description="❗ 음성 채널에서 나가요!")
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
@@ -259,7 +293,7 @@ class Music(commands.Cog):
         if not await command_before_invoke(self=self, interaction=interaction):
             return None
 
-        player = self.bot.lavalink.player_manager.get(interaction.guild.id)
+        player: lavalink.DefaultPlayer = self.bot.lavalink.player_manager.get(interaction.guild.id)
 
         if not player.is_connected:
             # We can't disconnect, if we're not connected.
@@ -268,7 +302,7 @@ class Music(commands.Cog):
         if not interaction.user.voice or (player.is_connected and interaction.user.voice.channel.id != int(player.channel_id)):
             # Abuse prevention. Users not in voice channels, or not in the same voice channel as the bot
             # may not disconnect the bot.
-            return await interaction.followup.send(content="`❗ 제가 연결된 음성 채널에서 명령어를 사용해주세요!`", ephemeral=True)
+            return await interaction.followup.send(content="`❗ 제가 연결된 음성 채널에서 명령어를 사용해주세요.`", ephemeral=True)
 
         # Disconnectiong
         # Clear the queue to ensure old tracks don't start playing
@@ -283,7 +317,7 @@ class Music(commands.Cog):
             print(e)
         finally:
             player.channel_id = None
-            await interaction.followup.send('`음성채널을 나갔어요!`')
+            await interaction.followup.send('`📤 음성채널을 나갔어요.`')
 
         # print(f"<{interaction.user.voice.channel} | {interaction.user.voice.channel.id}> 연결 해제")
 

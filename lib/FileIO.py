@@ -3,6 +3,8 @@ import orjson
 from os.path import isfile
 from os import rename, remove
 from lib import logger
+from pydantic.utils import deep_update
+
 class os:
     pass
 
@@ -58,7 +60,7 @@ class FileIO():
 
 
 
-    def make_json(self, path, name, data: dict = {}, detail: str = '') -> bool:
+    def make_json(self, path: str, name: str, data: dict = {}, detail: str = '') -> bool:
         if path.endswith(('/', '//', '''\\''')): # 제대로 path 가 제대로 된 형식인지 확인
             name = self._add_json_extension(name)
             path_n = path + name
@@ -79,7 +81,7 @@ class FileIO():
             logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{self.check_detail(detail)}make_json")
 
     def read_json(self, path: str, detail: str = '') -> typing.Union[dict, bool]:
-        if not (path := self.check_default(path=path, func_name=f'read_json'))[0]:
+        if not (path := self.check_default(path=path, func_name=f'{self.check_detail(detail)}read_json'))[0]:
             return False
         try:
             path = path[1]
@@ -93,12 +95,18 @@ class FileIO():
             logger.warn(log=f'{e}', detail=f"FileIO.{self.check_detail(detail)}read_json")
             return False
 
-
-    def edit_json(self, data: dict, update_data: dict) -> bool:
-        # json 의 키를 하나씩 대입함
-        # return None
-        raise "Plz programing this."
-
+    def edit_json(self, path: str, update_data: dict, detail: str = '') -> bool:
+        f_detail = detail + '.edit_json'
+        file_data = self.read_json(path=path, detail=f_detail)
+        if file_data is False:
+            return False
+        try:
+            save_data = deep_update(file_data, update_data)
+        except Exception as e:
+            logger.error(log=f"Error {e}", detail=f'FileIO.{self.check_detail(detail)}edit_json')
+            return False
+        else:
+            self.save_json(path=path, data=save_data, detail=f_detail)
 
     def save_json(self, path: str, data: dict, detail: str = '') -> bool:
         if not (path := self.check_default(path=path, func_name=f'{self.check_detail(detail)}save_json'))[0]:

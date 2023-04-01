@@ -91,3 +91,10 @@ application.yml
 
 # Test File
 test.py
+
+# Font
+*.ttf
+*.otf
+DB/font/*/*.svg
+
+image_server

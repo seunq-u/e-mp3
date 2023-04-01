@@ -29,7 +29,7 @@ async def ensure_voice(self, interaction: discord.Interaction) -> bool: # 에러
     """ 봇의 권한과, 유저가 봇과 같은 음성채널에 있는지 확인 하는 함수"""
     player = self.bot.lavalink.player_manager.create(interaction.guild.id) #, endpoint=str(ctx.guild.region))
     should_connect = interaction.command.name in ('재생', '연결', ) # 자동 연결 + 연결해야 해야 작동하는 명령어
-    free_commands = interaction.command.name in ( '도움말', ) # 연결 여부없이 작동하는 명령어
+    free_commands = interaction.command.name in ( '도움말', '플리') # 연결 여부없이 작동하는 명령어
 
     if free_commands is True:
         return True
@@ -322,6 +322,10 @@ class Music(commands.Cog):
         finally:
             player.channel_id = None
             await interaction.followup.send('`📤 음성채널을 나갔어요.`')
+
+
+
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Music(bot=bot))

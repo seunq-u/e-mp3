@@ -1,8 +1,10 @@
 """
-## utils.playlist.py  
-##### This is classes module
+## libs.FileIO.py  
+It's manage files in/out and protecting from json encoder and decoder's error
 
-* Playlist
+### func, class and value
+
+* DataManager (class)
 
 ###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
 """
@@ -16,7 +18,7 @@ import multiprocessing
 from multipledispatch import dispatch
 from queue import Queue
 
-from lib.Instruction import *
+from libs.Instruction import *
 
 
 

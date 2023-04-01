@@ -1,8 +1,19 @@
+"""
+## libs.FileIO.py  
+Directly access and manipulate of json file(user data, player data, etc. )
+
+### func, class and value
+
+* FileIO (class)
+
+###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+"""
+
 import typing
 import orjson
 from os.path import isfile
 from os import rename, remove
-from lib import logger
+from libs import logger
 from pydantic.utils import deep_update
 
 class os:

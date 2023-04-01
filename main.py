@@ -15,7 +15,7 @@ import logging
 import config
 import lavalink
 import time
-from lib import playlist
+from libs import playlist
 
 print('waiting lavalink be started')
 DIR = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))

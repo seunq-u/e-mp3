@@ -7,3 +7,4 @@ title E-Mp3
 @REM timeout /t 7 /nobreak
 
 .venv\Scripts\python.exe -u main.py
+pause

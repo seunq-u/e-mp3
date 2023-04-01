@@ -275,14 +275,16 @@
     ```json (playlist_uuid.json)
     {
         "name" : "<플리 이름>",
-        "description" : "<플리 성명>",
+        "description" : "<플리 설명>",
         "using_custom_cover_img" : "<커스텀 커버 이미지 사용여부(True/False)>",
         "cover_img" : "<플리 커버 이미지 파일명(userID_playlist_uuid)> 또는 기본 커버 이름(default_<number>)>", 
+        "cover_img_dominant_color" : "<커버 이미지의 대표색>",
         "playlist_uuid" : "<플리 고유 ID>",
         "owner_id" : "<소유자(유저) 디스코드 고유 ID>",
         "visibility" : "<공개여부|False:비공개/True:공개)",
         "first_date" : "<플리 최초 작성 날짜 및 시간 date-type4>",
         "last_date" : "<플리 최종 수정 날짜 및 시간 date-type4>",
+        "official" : "<공식플리 여부|False/True>",
         "music" : [
             {
                 "title" : "<음악의 제목>",

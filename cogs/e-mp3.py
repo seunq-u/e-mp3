@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from typing import Literal
-from lib import utilbox
+from libs import utilbox
 
 import config
 

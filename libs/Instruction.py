@@ -1,4 +1,17 @@
-from lib.FileIO import FileIO
+"""
+## libs.FileIO.py  
+It's a collection of command instruction (and creation class) used in the DataManager
+
+### func, class and value
+
+* UserInstruction (class)
+* PlaylistInstruction (class)
+* CreateInstruction (class)
+
+###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+"""
+
+from libs.FileIO import FileIO
 
 
 class UserInstruction(FileIO):

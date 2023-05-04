@@ -1,0 +1,67 @@
+{
+    "name" : "NewJeans 1st EP 'New Jeans'",
+    "description" : "New Jeans is the debut extended play (EP) by South Korean girl group NewJeans. The EP contains four tracks, including the three singles \"Attention\", \"Hype Boy\" and \"Cookie\".",
+    "using_custom_cover_img" : true,
+    "cover_img" : "https://img.youtube.com/vi/js1CtxSY38I/maxresdefault.jpg", 
+    "cover_img_dominant_color" : false,
+    "playlist_uuid" : "7aaaaaaa-3bbb-3ccc-3ddd-3eee7fff3ggg",
+    "owner_id" : 1,
+    "visibility" : false,
+    "first_date" : "2022/08/01-01.01.01",
+    "last_date" : "2023/03/25-05.05.05",
+    "official" : true,
+    "music" : [
+        {
+            "title" : "Attention",
+            "link" : "https://youtube.com/watch?v=kdOS94IjzzE",
+            "time" : 181,
+            "author" : "NewJeans",
+            "author_link" : "https://www.youtube.com/channel/UCMki_UkHb4qSc0qyEcOHHJw",
+            "thumbnail" : "https://lh3.googleusercontent.com/yg7U52lN4NMHddFXE1de6d99puDNeC-1U6q5PnLjXPatrexqW9AOoWC8a5EJBULlXraaEWU8OvKrFYrp1A=w544-h544-l90-rj",
+            "c_name" : "Attention",
+            "c_singer" : "NewJeans"
+        },
+
+        {
+            "title" : "Hype Boy",
+            "link" : "https://youtube.com/watch?v=ghrlZIMDzbM",
+            "time" : 180,
+            "author" : "NewJeans",
+            "author_link" : "https://www.youtube.com/channel/UCMki_UkHb4qSc0qyEcOHHJw",
+            "thumbnail" : "https://lh3.googleusercontent.com/yg7U52lN4NMHddFXE1de6d99puDNeC-1U6q5PnLjXPatrexqW9AOoWC8a5EJBULlXraaEWU8OvKrFYrp1A=w544-h544-l90-rj",
+            "c_name" : "Hype Boy",
+            "c_singer" : "NewJeans"
+        },
+
+        {
+            "title" : "Cookie",
+            "link" : "https://youtube.com/watch?v=0M4QMVQJRsw",
+            "time" : 236,
+            "author" : "NewJeans",
+            "author_link" : "https://www.youtube.com/channel/UCMki_UkHb4qSc0qyEcOHHJw",
+            "thumbnail" : "https://lh3.googleusercontent.com/yg7U52lN4NMHddFXE1de6d99puDNeC-1U6q5PnLjXPatrexqW9AOoWC8a5EJBULlXraaEWU8OvKrFYrp1A=w544-h544-l90-rj",
+            "c_name" : "Cookie",
+            "c_singer" : "NewJeans"
+        },
+
+        {
+            "title" : "Hurt",
+            "link" : "https://youtube.com/watch?v=8QWtOgBJZNc",
+            "time" : 178,
+            "author" : "NewJeans",
+            "author_link" : "https://www.youtube.com/channel/UCMki_UkHb4qSc0qyEcOHHJw",
+            "thumbnail" : "https://lh3.googleusercontent.com/yg7U52lN4NMHddFXE1de6d99puDNeC-1U6q5PnLjXPatrexqW9AOoWC8a5EJBULlXraaEWU8OvKrFYrp1A=w544-h544-l90-rj",
+            "c_name" : "Hurt",
+            "c_singer" : "NewJeans"
+        }
+    ],
+    "heart" : {
+        "today" : [],
+        "last" : [
+            {"date-type2" : 0}
+        ],
+        "week" : 70,
+        "month" : 310, 
+        "all" : 10500
+    }
+}

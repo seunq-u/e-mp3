@@ -6,7 +6,7 @@ It's manage files in/out and protecting from json encoder and decoder's error
 
 * DataManager (class)
 
-###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
 import dataclasses

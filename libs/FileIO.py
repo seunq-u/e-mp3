@@ -6,7 +6,7 @@ Directly access and manipulate of json file(user data, player data, etc. )
 
 * FileIO (class)
 
-###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
 import typing

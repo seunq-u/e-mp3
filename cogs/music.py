@@ -80,11 +80,12 @@ class LavalinkVoiceClient(discord.VoiceClient):
         if hasattr(self.client, 'lavalink'):
             self.lavalink = self.client.lavalink
         else:
-            self.client.lavalink = lavalink.Client(client.user.id)
+            self.client.lavalink: lavalink.Client = lavalink.Client(client.user.id)
             self.client.lavalink.add_node(
                 host = config.Lavalink_DATA.HOST,
                 port = config.Lavalink_DATA.PORT,
                 password = config.Lavalink_DATA.PASSWORD,
+                ssl = config.Lavalink_DATA.SSL,
                 region = config.Lavalink_DATA.REGION,
                 name = config.Lavalink_DATA.NAME,
                 reconnect_attempts = config.Lavalink_DATA.RECONNECT_ATTEMPTS,
@@ -154,11 +155,12 @@ class Music(commands.Cog):
         self.bot = bot
 
         if not hasattr(bot, 'lavalink'):  # This ensures the client isn't overwritten during cog reloads.
-            bot.lavalink = lavalink.Client(bot.user.id)
+            bot.lavalink: lavalink.Client = lavalink.Client(bot.user.id)
             bot.lavalink.add_node(
                 host = config.Lavalink_DATA.HOST,
                 port = config.Lavalink_DATA.PORT,
                 password = config.Lavalink_DATA.PASSWORD,
+                ssl = config.Lavalink_DATA.SSL,
                 region = config.Lavalink_DATA.REGION,
                 name = config.Lavalink_DATA.NAME,
                 reconnect_attempts = config.Lavalink_DATA.RECONNECT_ATTEMPTS,

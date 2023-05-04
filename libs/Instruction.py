@@ -8,7 +8,7 @@ It's a collection of command instruction (and creation class) used in the DataMa
 * PlaylistInstruction (class)
 * CreateInstruction (class)
 
-###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
 from libs.FileIO import FileIO
@@ -91,6 +91,12 @@ class PlaylistInstruction(FileIO):
     def add_heart(self, ):
         pass
 
+    def alter_dominant_color(self, ):
+        pass
+
+    def alter_background_type(self, ):
+        "X"
+        pass
 
 class CreateInstruction():
     """DataManager.put 의 Data 인자를 만들어 주는 클래스

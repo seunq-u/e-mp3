@@ -97,4 +97,6 @@ test.py
 *.otf
 DB/font/*/*.svg
 
-image_server
+#folder
+web/*
+source/*

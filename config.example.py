@@ -2,7 +2,7 @@
 # <config.py>
 ## E-Mp3 Bot Config Example
 
-###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
 # <<--- Bot --->>
@@ -49,6 +49,7 @@ class Lavalink_DATA:
     HOST = "localhost"
     PORT = 2333
     PASSWORD = "password"
+    SSL = False
     REGION = "kr"
     NAME = f"{NAME}_{ID}_BOT"
     RECONNECT_ATTEMPTS = 10

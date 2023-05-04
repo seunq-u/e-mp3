@@ -1,7 +1,7 @@
 """
 # E-Mp3 Bot
 
-###### ⓒ 2023. MaenGGo.ß STUDIO All rights reserved.
+###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
 if __name__ != '__main__':
@@ -14,18 +14,38 @@ from discord.ext import commands
 import logging
 import config
 import lavalink
-import time
+import subprocess
+import time, sys
 from libs import playlist
+import argparse
 
-print('waiting lavalink be started')
+parser = argparse.ArgumentParser()
+parser.add_argument("--lavalink", action="store_true")
+
+Args = parser.parse_args()
+IS_LAVALINK = Args.lavalink
+if IS_LAVALINK:
+    log_msg = f'{time.strftime("%x - %X")} / [\033[96mSET\033[0m] [{config.NAME}/SET]: \033[96mWithout starting lavalink.jar\033[0m'
+    print(log_msg)
+
+
 DIR = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))
-os.system('start "Lavalink" /min lavalink.bat')
-time.sleep(5)
+
+try:
+    if IS_LAVALINK:
+        print('waiting lavalink be started')
+        # os.system('start "Lavalink" /min lavalink.bat')
+        proc_lavalink = subprocess.Popen(['lavalink.bat'], shell=False)
+        time.sleep(5)
+
+except Exception as e:
+    print('error: lavalink fail')
+
 
 # <<--- Auto Logger --->>
 auto_logger = logging.getLogger()
 auto_logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s / [{}%(levelname)s{}] [%(name)s]: %(message)s'.format("\033[32m", "\033[0m"), datefmt='%H시 %M분 %S초')
+formatter = logging.Formatter('%(asctime)s.%(msecs)03d  {}%(levelname)s{} 00000 --- [%(name)+15s] : %(message)s'.format("\033[32m", "\033[0m"), datefmt='%Y-%m-%d %H:%M:%S')
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
 auto_logger.addHandler(stream_handler)
@@ -103,5 +123,6 @@ except KeyboardInterrupt:
 except Exception as e:
     print(f'\n다음 에러로 봇이 실행되지 않았어요.\n-> {e}\n')
 
+proc_lavalink.terminate()
 
 

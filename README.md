@@ -1,4 +1,4 @@
-# 1. Every-Mp3
+# 1. [Every-Mp3](<https://docs.e-mp3.kro.kr/main>)
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -53,7 +53,7 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
     여러분의 소중한 의견은 언제나 환영하며, 더욱 더 나은 봇으로 발전할 수 있도록 노력하겠습니다.
     감사합니다! 🙏🎵
 
-🚠[튜토리얼](<https://docs.e-mp3.kro.kr/tutorial>) 시작하기!  
+🚠[튜토리얼](<https://docs.e-mp3.kro.kr/main>) 시작하기!  
 
 📸profile image by [Midjourney](<https://midjourney.com/>)  
 ⓒ 2023. ManGGo.ß STUDIO All rights reserved.  

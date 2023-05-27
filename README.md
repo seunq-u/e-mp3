@@ -18,7 +18,7 @@
     </body>
 </html>
 
-## 1.1. 간단한 설명
+## 1.1. 소개
 
 EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 새롭고 멋진 경험을 드리기 위해 제작되었어요!🎵💝
 
@@ -59,7 +59,7 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
 ⓒ 2023. ManGGo.ß STUDIO All rights reserved.  
 
 - [1. Every-Mp3](#1-every-mp3)
-  - [1.1. 간단한 설명](#11-간단한-설명)
+  - [1.1. 소개](#11-소개)
   - [1.2. TODO](#12-todo)
   - [1.3. DEV ROADMAP](#13-dev-roadmap)
   - [1.4. config 설정](#14-config-설정)
@@ -107,12 +107,17 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
     - [x] : logger.py
     - [x] : FileIO.py
     - [ ] : Instruction.py
+        - [ ] playlist 관련 함수
+        - [ ] user 관련 함수
+        - [ ] 요청 생성 함수
     - [x] : DBMS.py
-        1. link FileIO.py
-        2. link Instruction.py
-        3. using multiprocessing to make auto data updating
-        4. From json file get data
+        - [x] : link FileIO.py  
+        - [x] : link Instruction.py  
+        - [x] : using multiprocessing to make auto data updating  
     - [ ] : Playlist.py (class)
+        - [x] : 이미지 생성 (앞 장)
+        - [ ] : 이미지 생성 (뒷 장)
+        - [ ] : 기능 구현
     - [x] : Task.py
 
 1. 약관 동의/철회 (lib.terms.py)

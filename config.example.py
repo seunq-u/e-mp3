@@ -48,9 +48,14 @@ class Emoji:
 class Lavalink_DATA:
     HOST = "localhost"
     PORT = 2333
-    PASSWORD = "password"
+    PASSWORD = "YourLavalinkPassword"
     SSL = False
     REGION = "kr"
     NAME = f"{NAME}_{ID}_BOT"
     RECONNECT_ATTEMPTS = 10
     RESUME_TIMEOUT = 300
+
+
+# <<--- DBMS --->>
+class DBMS:
+    task_thread_count = 12

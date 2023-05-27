@@ -77,6 +77,7 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
     - [1.9.1. DBMS](#191-dbms)
       - [1.9.1.1 용어](#1911-용어)
       - [1.9.1.2. Instruction](#1912-instruction)
+      - [1.9.1.3. 전체 과정](#1913-전체-과정)
     - [1.9.2. 플리 집계 및 저장](#192-플리-집계-및-저장)
     - [1.9.3. 플리의 저장 및 백업](#193-플리의-저장-및-백업)
     - [1.9.4. 플리의 비공개 \<-\> 공개](#194-플리의-비공개---공개)
@@ -106,7 +107,7 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
     - [x] : logger.py
     - [x] : FileIO.py
     - [ ] : Instruction.py
-    - [ ] : DBMS.py
+    - [x] : DBMS.py
         1. link FileIO.py
         2. link Instruction.py
         3. using multiprocessing to make auto data updating
@@ -296,6 +297,27 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
     11. alter_dominant_color : 대표색 수정
     12. alter_background_type : 배경 타입 변경
 
+#### 1.9.1.3. 전체 과정
+
+- 준비
+
+1. Instruction.CreateInstruction.~ 으로 요청데이터(명령어 종류, 사용자 정보, 작업에 필요한 데이터를 포함)를 생성
+
+- 요청
+
+1. 생성된 요청 데이터를 DBMS에 PUT
+2. 작업 큐(Task.QueueMananger.put_task)에 작업 요청 추가
+3. 작업 요청의 상태 추가 (Task.StatusManager.add_task)
+
+- 실행
+
+1. 작업 요청 상태 - 실행 중 변경
+2. 분배된 작업요청을 멀티프로세싱(multiprocessing) 으로 실행
+
+- 완료
+
+1. 작업 요청 상태 - 완료/실패/comment 변경 (해당 함수에서 추가 / Instruction.Instruction)
+
 ### 1.9.2. 플리 집계 및 저장
 
 1. 집계의 기준
@@ -357,6 +379,8 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
 
     ```json
     {
+        "InstructName" : "사용된 명령어 이름(DBMS에서 자동으로 생성되는 항목)",
+        "Identifier" : "식별자(DBMS에서 자동으로 생성되는 항목)",
         "name" : "<플리 이름>",
         "description" : "<플리 설명>",
         "using_custom_cover_img" : "<커스텀 커버 이미지 사용여부(True/False)>",
@@ -398,6 +422,8 @@ EP3봇은 단순이 음악을 즐기는 것 뿐만 아니라,  여러분에게 �
 
     ```json
     {
+        "InstructName" : "사용된 명령어 이름(DBMS에서 자동으로 생성되는 항목)",
+        "Identifier" : "식별자(DBMS에서 자동으로 생성되는 항목)",
         "user_id" : "<소유자(유저) 디스코드 고유 ID>",
         "nickname" : "플리 공유상의 닉네임",
         "kdbl_point": 0, // 한디리(Korean discrod bot list) 하트 포인트

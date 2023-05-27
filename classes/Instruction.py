@@ -14,12 +14,12 @@ It's a collection of command instruction (and creation class) used in the DataMa
 from classes.FileIO import FileIO
 
 
-class UserInstruction(FileIO):
-    """DataManager 가 실행하는 유저 명령 모음
-    """
+class Instruction(FileIO):
     def __init__(self) -> None:
         pass
 
+
+    # 유저 명령 모음
     def create_account(self, data: dict):
         # 실제로 json 에 접근하는 구문들
         pass
@@ -54,10 +54,7 @@ class UserInstruction(FileIO):
     def delete_bookmark(self, ):
         pass
 
-
-class PlaylistInstruction(FileIO):
-    """DataManager 가 실행하는 플리 명령 모음
-    """
+    # 플리 명령 모음
     def __init__(self) -> None:
         pass
 

@@ -11,7 +11,7 @@ It's a collection of command instruction (and creation class) used in the DataMa
 ###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
-from libs.FileIO import FileIO
+from classes.FileIO import FileIO
 
 
 class UserInstruction(FileIO):
@@ -98,6 +98,7 @@ class PlaylistInstruction(FileIO):
         "X"
         pass
 
+
 class CreateInstruction():
     """DataManager.put 의 Data 인자를 만들어 주는 클래스
     """
@@ -173,6 +174,9 @@ class CreateInstruction():
         pass
 
     def add_music(self, ):
+        pass
+
+    def alter_muisc(self, ):
         pass
 
     def remove_music(self, ):

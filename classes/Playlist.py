@@ -32,7 +32,9 @@ from PIL import Image as PIL_Image
 
 
 class BasePlaylist(ABC):
-    pass
+    def load_music(self):
+        """lavalink를 통해 음악을 로드
+        """
 
 class Queue():
     pass

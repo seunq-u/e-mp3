@@ -15,83 +15,84 @@ from classes.FileIO import FileIO
 
 
 class Instruction(FileIO):
+    """DBMS 가 실행하는 함수"""
+
     def __init__(self) -> None:
         pass
 
-
     # 유저 명령 모음
-    def create_account(self, data: dict):
+    def create_account(data: dict):
         # 실제로 json 에 접근하는 구문들
         pass
 
-    def delete_account(self, data: dict):
+    def delete_account(data: dict):
         pass
 
-    def alter_nickname(self, ):
+    def alter_nickname(data: dict):
         pass
 
-    def add_kdbl_point(self, ):
+    def add_kdbl_point(data: dict):
         pass
 
-    def alter_terms_pp(self, ):
+    def alter_terms_pp(data: dict):
         pass
 
-    def alter_terms_tos(self, ):
+    def alter_terms_tos(data: dict):
         pass
 
-    def alter_trems_mc(self, ):
+    def alter_trems_mc(data: dict):
         pass
 
-    def add_playlist(self, ):
+    def add_playlist(data: dict):
         pass
 
-    def delete_playlist(self, ):
+    def delete_playlist(data: dict):
         pass
 
-    def add_bookmark(self, ):
+    def add_bookmark(data: dict):
         pass
 
-    def delete_bookmark(self, ):
+    def delete_bookmark(data: dict):
         pass
 
     # 플리 명령 모음
     def __init__(self) -> None:
         pass
 
-    def create_playlist(self, ):
+    def create_playlist(data: dict):
         pass
 
-    def remove_playlist(self, ):
+    def remove_playlist(data: dict):
         pass
 
-    def alter_name(self, ):
+    def alter_name(data: dict):
         pass
 
-    def alter_description(self, ):
+    def alter_description(data: dict):
         pass
 
-    def alter_using_custom_cover_img(self, ):
+    def alter_using_custom_cover_img(data: dict):
         pass
 
-    def alter_cover_img(self, ):
+    def alter_cover_img(data: dict):
         pass
 
-    def alter_visibility(self, ):
+    def alter_visibility(data: dict):
         pass
 
-    def add_music(self, ):
+    def add_music(data: dict):
         pass
 
-    def remove_music(self, ):
+    def remove_music(data: dict):
         pass
 
-    def add_heart(self, ):
+    def add_heart(data: dict):
         pass
 
-    def alter_dominant_color(self, ):
+    def alter_dominant_color(data: dict):
         pass
 
-    def alter_background_type(self, ):
+    def alter_background_type(data: dict):
         "X"
         pass
 
@@ -99,14 +100,12 @@ class Instruction(FileIO):
 class CreateInstruction():
     """DataManager.put 의 Data 인자를 만들어 주는 클래스
     """
-    def __init__(self) -> None:
-        pass
-
     # <<<--- user --->>>
 
-    def create_account(self, user_id: int, nickname: str, terms: tuple[bool, bool, bool]):
+    def create_account(user_id: int, nickname: str, terms: tuple[bool, bool, bool]):
         # 리턴으로 dict 형 data가 나옴
         data = {
+            "Ins" : Instruction.create_account,
             "user_id" : user_id,
             "nickname" : nickname,
             "terms" : {
@@ -117,67 +116,67 @@ class CreateInstruction():
         }
         return data
 
-    def delete_account(self, ):
+    def delete_account():
         pass
 
-    def alter_nickname(self, ):
+    def alter_nickname():
         pass
 
-    def add_kdbl_point(self, ):
+    def add_kdbl_point():
         pass
 
-    def alter_terms_pp(self, ):
+    def alter_terms_pp():
         pass
 
-    def alter_terms_tos(self, ):
+    def alter_terms_tos():
         pass
 
-    def alter_trems_mc(self, ):
+    def alter_trems_mc():
         pass
 
-    def add_playlist(self, ):
+    def add_playlist():
         pass
 
-    def delete_playlist(self, ):
+    def delete_playlist():
         pass
 
-    def add_bookmark(self, ):
+    def add_bookmark():
         pass
 
-    def delete_bookmark(self, ):
+    def delete_bookmark():
         pass
 
     # <<<--- playlist --->>>
 
-    def create_playlist(self, ):
+    def create_playlist():
         pass
 
-    def remove_playlist(self, ):
+    def remove_playlist():
         pass
 
-    def alter_name(self, ):
+    def alter_name():
         pass
 
-    def alter_description(self, ):
+    def alter_description():
         pass
 
-    def alter_using_custom_cover_img(self, ):
+    def alter_using_custom_cover_img():
         pass
 
-    def alter_cover_img(self, ):
+    def alter_cover_img():
         pass
 
-    def alter_visibility(self, ):
+    def alter_visibility():
         pass
 
-    def add_music(self, ):
+    def add_music():
         pass
 
-    def alter_muisc(self, ):
+    def alter_muisc():
         pass
 
-    def remove_music(self, ):
+    def remove_music():
         pass
 
-    def add_heart(self, ):
+    def add_heart():
         pass

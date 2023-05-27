@@ -12,87 +12,126 @@ It's a collection of command instruction (and creation class) used in the DataMa
 """
 
 from classes.FileIO import FileIO
+from classes.Task import StatusManager
+import time, random
 
-
-class Instruction(FileIO):
+class Instruction():
     """DBMS 가 실행하는 함수"""
 
     def __init__(self) -> None:
         pass
 
-    # 유저 명령 모음
-    def create_account(data: dict):
-        # 실제로 json 에 접근하는 구문들
+    def remove_identifier(func):
+        def wrapper(data: dict, *args):
+            data.pop("Instruct")
+            return func(data, *args)
+        return wrapper
+
+    # <<--- 유저 명령 모음 --->>
+    @remove_identifier
+    def create_account(data: dict, *args):
+        if (result := FileIO.make_json(path="DB//user//", name=data.get('user_id'), data=data))[0]:
+            StatusManager.set_task(
+                id = data.get('Identifier'),
+                status='done',
+                result=True
+            )
+        else:
+            StatusManager.set_task(
+                id = data.get('Identifier'),
+                status='done',
+                result=False,
+                comment=result[1]
+            )
+        return 0
+
+    @remove_identifier
+    def delete_account(data: dict, *args, **kwargs):
         pass
 
-    def delete_account(data: dict):
+    @remove_identifier
+    def alter_nickname(data: dict, *args, **kwargs):
         pass
 
-    def alter_nickname(data: dict):
+    @remove_identifier
+    def add_kdbl_point(data: dict, *args, **kwargs):
         pass
 
-    def add_kdbl_point(data: dict):
+    @remove_identifier
+    def alter_terms_pp(data: dict, *args, **kwargs):
         pass
 
-    def alter_terms_pp(data: dict):
+    @remove_identifier
+    def alter_terms_tos(data: dict, *args, **kwargs):
         pass
 
-    def alter_terms_tos(data: dict):
+    @remove_identifier
+    def alter_trems_mc(data: dict, *args, **kwargs):
         pass
 
-    def alter_trems_mc(data: dict):
+    @remove_identifier
+    def add_playlist(data: dict, *args, **kwargs):
         pass
 
-    def add_playlist(data: dict):
+    @remove_identifier
+    def delete_playlist(data: dict, *args, **kwargs):
         pass
 
-    def delete_playlist(data: dict):
+    @remove_identifier
+    def add_bookmark(data: dict, *args, **kwargs):
         pass
 
-    def add_bookmark(data: dict):
+    @remove_identifier
+    def delete_bookmark(data: dict, *args, **kwargs):
         pass
 
-    def delete_bookmark(data: dict):
+    
+    @remove_identifier# 플리 명령 모음
+    def create_playlist(data: dict, *args, **kwargs):
         pass
 
-    # 플리 명령 모음
-    def __init__(self) -> None:
+    @remove_identifier
+    def remove_playlist(data: dict, *args, **kwargs):
         pass
 
-    def create_playlist(data: dict):
+    @remove_identifier
+    def alter_name(data: dict, *args, **kwargs):
         pass
 
-    def remove_playlist(data: dict):
+    @remove_identifier
+    def alter_description(data: dict, *args, **kwargs):
         pass
 
-    def alter_name(data: dict):
+    @remove_identifier
+    def alter_using_custom_cover_img(data: dict, *args, **kwargs):
         pass
 
-    def alter_description(data: dict):
+    @remove_identifier
+    def alter_cover_img(data: dict, *args, **kwargs):
         pass
 
-    def alter_using_custom_cover_img(data: dict):
+    @remove_identifier
+    def alter_visibility(data: dict, *args, **kwargs):
         pass
 
-    def alter_cover_img(data: dict):
+    @remove_identifier
+    def add_music(data: dict, *args, **kwargs):
         pass
 
-    def alter_visibility(data: dict):
+    @remove_identifier
+    def remove_music(data: dict, *args, **kwargs):
         pass
 
-    def add_music(data: dict):
+    @remove_identifier
+    def add_heart(data: dict, *args, **kwargs):
         pass
 
-    def remove_music(data: dict):
+    @remove_identifier
+    def alter_dominant_color(data: dict, *args, **kwargs):
         pass
 
-    def add_heart(data: dict):
-        pass
-
-    def alter_dominant_color(data: dict):
-        pass
-
-    def alter_background_type(data: dict):
+    @remove_identifier
+    def alter_background_type(data: dict, *args, **kwargs):
         "X"
         pass
 
@@ -105,7 +144,9 @@ class CreateInstruction():
     def create_account(user_id: int, nickname: str, terms: tuple[bool, bool, bool]):
         # 리턴으로 dict 형 data가 나옴
         data = {
-            "Ins" : Instruction.create_account,
+            "Instruct" : Instruction.create_account,
+            "InstructName" : 'create_account',
+            "Identifier" : user_id,
             "user_id" : user_id,
             "nickname" : nickname,
             "terms" : {

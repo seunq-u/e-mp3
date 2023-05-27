@@ -15,6 +15,7 @@ from os.path import isfile
 from os import rename, remove
 from libs import logger
 from pydantic.utils import deep_update
+import datetime
 
 class os:
     pass
@@ -29,10 +30,7 @@ rename, isfile, remove = None, None, None
 class FileIO():
     """파일 입출력 클래스
     """
-    def __init__(self) -> None:
-        pass
-
-    def _check_secure_path(self, path: str, func_name: str = '???') -> bool:
+    def _check_secure_path(path: str, func_name: str = '???') -> bool:
         path_up = path.upper()
         if path_up.startswith(('DB/', 'DB//', '''DB\\''')):
             return True
@@ -40,13 +38,13 @@ class FileIO():
             logger.error(log=f"Wrong or Disallowed Path Error : {path}", detail=f"FileIO._check_secure_path.{func_name}")
             return False
 
-    def _check_true_path(self, path: str, func_name: str = '???') -> bool:
+    def _check_true_path(path: str, func_name: str = '???') -> bool:
         if not os.isfile(f'{path}'):
             logger.warn(log=f"Not Found Path : {path}", detail=f"FileIO._check_true_path.{func_name}")
             return False
         return True
 
-    def _add_json_extension(self, path: str, func_name: str = '???') -> str:
+    def _add_json_extension(path: str, func_name: str = '???') -> str:
         try:
             path = str(path)
             if path[-5:] != '.json':
@@ -55,15 +53,18 @@ class FileIO():
         except Exception as e:
             logger.warn(log=f"Error : {e}", detail=f"FileIO._add_json_extension.{func_name}")
 
+    def _task_error_comment(error: str):
+        return f'[{str(datetime.datetime.now())}] {error}'
 
-    def check_default(self, path: str, func_name: str = '???') -> tuple[bool, str]:
-        if self._check_secure_path(path=path, func_name=func_name):
-            path = self._add_json_extension(path=path, func_name=func_name)
-            if self._check_true_path(path=path, func_name=func_name):
+
+    def check_default(path: str, func_name: str = '???') -> tuple[bool, str]:
+        if FileIO._check_secure_path(path=path, func_name=func_name):
+            path = FileIO._add_json_extension(path=path, func_name=func_name)
+            if FileIO._check_true_path(path=path, func_name=func_name):
                 return (True, path)
         return (False, path)
 
-    def check_detail(self, detail: str):
+    def check_detail(detail: str):
         if detail != '':
             detail = detail + '.'
         return detail
@@ -71,28 +72,29 @@ class FileIO():
 
 
 
-    def make_json(self, path: str, name: str, data: dict = {}, detail: str = '') -> bool:
+    def make_json(path: str, name: str, data: dict = {}, detail: str = '') -> tuple[bool, typing.Any]:
         if path.endswith(('/', '//', '''\\''')): # 제대로 path 가 제대로 된 형식인지 확인
-            name = self._add_json_extension(name)
+            name = FileIO._add_json_extension(name)
             path_n = path + name
 
-            if not self._check_secure_path(path=path_n, func_name=f'{self.check_detail(detail)}make_json'): # 경로가 DB 인지 확인
+            if not FileIO._check_secure_path(path=path_n, func_name=f'{FileIO.check_detail(detail)}make_json'): # 경로가 DB 인지 확인
                 return False
 
             try:
                 with open(f'{path_n}', 'wb') as f:
                     f.write(orjson.dumps(data))
-                return True
+                return True, True
 
             except Exception as e:
-                logger.warn(log=f'{e}', detail=f'{self.check_detail(detail)}make_json')
-                return False
+                logger.warn(log=f'{e}', detail=f'{FileIO.check_detail(detail)}make_json')
+                return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] {e}')
 
         else:
-            logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{self.check_detail(detail)}make_json")
+            logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{FileIO.check_detail(detail)}make_json")
+            return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] Path Should be ended by / or // or \\')
 
-    def read_json(self, path: str, detail: str = '') -> typing.Union[dict, bool]:
-        if not (path := self.check_default(path=path, func_name=f'{self.check_detail(detail)}read_json'))[0]:
+    def read_json(path: str, detail: str = '') -> typing.Union[dict, bool]:
+        if not (path := FileIO.check_default(path=path, func_name=f'{FileIO.check_detail(detail)}read_json'))[0]:
             return False
         try:
             path = path[1]
@@ -100,27 +102,27 @@ class FileIO():
                 data = orjson.loads(f.read())
             return data
         except orjson.JSONDecodeError as e:
-            logger.warn(log=f'JSONDecodeError: {e}', detail=f"FileIO.{self.check_detail(detail)}read_json")
+            logger.warn(log=f'JSONDecodeError: {e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
             return dict()
         except Exception as e:
-            logger.warn(log=f'{e}', detail=f"FileIO.{self.check_detail(detail)}read_json")
+            logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
             return False
 
-    def edit_json(self, path: str, update_data: dict, detail: str = '') -> bool:
+    def edit_json(path: str, update_data: dict, detail: str = '') -> bool:
         f_detail = detail + '.edit_json'
-        file_data = self.read_json(path=path, detail=f_detail)
+        file_data = FileIO.read_json(path=path, detail=f_detail)
         if file_data is False:
             return False
         try:
             save_data = deep_update(file_data, update_data)
         except Exception as e:
-            logger.error(log=f"Error {e}", detail=f'FileIO.{self.check_detail(detail)}edit_json')
+            logger.error(log=f"Error {e}", detail=f'FileIO.{FileIO.check_detail(detail)}edit_json')
             return False
         else:
-            self.save_json(path=path, data=save_data, detail=f_detail)
+            FileIO.save_json(path=path, data=save_data, detail=f_detail)
 
-    def save_json(self, path: str, data: dict, detail: str = '') -> bool:
-        if not (path := self.check_default(path=path, func_name=f'{self.check_detail(detail)}save_json'))[0]:
+    def save_json(path: str, data: dict, detail: str = '') -> bool:
+        if not (path := FileIO.check_default(path=path, func_name=f'{FileIO.check_detail(detail)}save_json'))[0]:
             return False
         try:
             path = path[1]
@@ -128,35 +130,35 @@ class FileIO():
                 f.write(orjson.dumps(data))
             return True
         except Exception as e:
-            logger.warn(log=f'{e}', detail=f"FileIO.{self.check_detail(detail)}save_json")
+            logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}save_json")
             return False
 
 
-    def rename_json(self, path: str, old_name: str, new_name: str, detail: str = '') -> bool:
-        if not self._check_secure_path(path=path, func_name=f'{self.check_detail(detail)}rename_json'):
+    def rename_json(path: str, old_name: str, new_name: str, detail: str = '') -> bool:
+        if not FileIO._check_secure_path(path=path, func_name=f'{FileIO.check_detail(detail)}rename_json'):
             return False
 
-        old_name_p = self._add_json_extension(path=path+old_name, func_name=f'{self.check_detail(detail)}rename_json')
-        new_name_p = self._add_json_extension(path=path+new_name, func_name=f'{self.check_detail(detail)}rename_json')
+        old_name_p = FileIO._add_json_extension(path=path+old_name, func_name=f'{FileIO.check_detail(detail)}rename_json')
+        new_name_p = FileIO._add_json_extension(path=path+new_name, func_name=f'{FileIO.check_detail(detail)}rename_json')
 
-        if not self._check_true_path(path=old_name_p, func_name=f'{self.check_detail(detail)}rename_json'):
+        if not FileIO._check_true_path(path=old_name_p, func_name=f'{FileIO.check_detail(detail)}rename_json'):
             return False
 
         try:
             os.rename(old_name_p, new_name_p)
             return True
         except Exception as e:
-            logger.error(log=f'Rename Error: {e}', detail=f'{self.check_detail(detail)}.rename_json')
+            logger.error(log=f'Rename Error: {e}', detail=f'{FileIO.check_detail(detail)}.rename_json')
             return False
 
 
-    def remove_json(self, path: str, detail: str = '') -> bool:
-        if not (path := self.check_default(path=path, func_name=f'{self.check_detail(detail)}remove_json'))[0]:
+    def remove_json(path: str, detail: str = '') -> bool:
+        if not (path := FileIO.check_default(path=path, func_name=f'{FileIO.check_detail(detail)}remove_json'))[0]:
             return False
         try:
             path = path[1]
             os.remove(path)
             return True
         except Exception as e:
-            logger.warn(log=f'{e}', detail=f"FileIO.{self.check_detail(detail)}remove_json")
+            logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}remove_json")
             return False

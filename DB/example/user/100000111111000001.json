@@ -1,0 +1,11 @@
+{
+    "InstructName" : "create_account",
+    "Identifier" : 100000111111000001,
+    "user_id" : 100000111111000001,
+    "nickname" : "일공>일<공일#0001",
+    "terms" : {
+        "policy_privacy" : true,
+        "terms_of_service" : true,
+        "marketing_consent" : true
+    }
+}

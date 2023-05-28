@@ -88,7 +88,7 @@ class FileIO():
             path_n = path + name
 
             if not FileIO._check_secure_path(path=path_n, func_name=f'{FileIO.check_detail(detail)}make_json'): # 경로가 DB 인지 확인
-                return False
+                return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] Wrong or Disallowed Path Error')
 
             try:
                 with open(f'{path_n}', 'wb') as f:
@@ -103,33 +103,40 @@ class FileIO():
             logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{FileIO.check_detail(detail)}make_json")
             return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] Path Should be ended by / or // or \\')
 
-    def read_json(path: str, detail: str = '') -> typing.Union[dict, bool]:
+    def read_json(path: str, detail: str = '') -> tuple[typing.Union[dict, bool], typing.Union[str, None]]:
         if not (path := FileIO.check_default(path=path, func_name=f'{FileIO.check_detail(detail)}read_json'))[0]:
-            return False
+            return (False, f'Not Fount File in {path}')
         try:
             path = path[1]
             with open(f'{path}', 'rb') as f:
                 data = orjson.loads(f.read())
-            return data
+            return (data, )
+
         except orjson.JSONDecodeError as e:
             logger.warn(log=f'JSONDecodeError: {e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
-            return dict()
+            return (False, f"FileIO.{FileIO.check_detail(detail)}read_json {e}")
+
         except Exception as e:
             logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
-            return False
+            return (False, f"FileIO.{FileIO.check_detail(detail)}read_json {e}")
 
-    def edit_json(path: str, update_data: dict, detail: str = '') -> bool:
+    def edit_json(path: str, update_data: dict, detail: str = '') -> tuple[bool, typing.Any]:
         f_detail = detail + '.edit_json'
         file_data = FileIO.read_json(path=path, detail=f_detail)
-        if file_data is False:
-            return False
+
+        if file_data[0] is False:
+            return False, FileIO._task_error_comment(file_data[1])
+
         try:
-            save_data = FileIO.merge_dict(file_data, update_data)
+            save_data = FileIO.merge_dict(file_data[0], update_data)
+
         except Exception as e:
             logger.error(log=f"Error {e}", detail=f'FileIO.{FileIO.check_detail(detail)}edit_json')
-            return False
+            return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}edit_json] {e}')
+
         else:
             FileIO.save_json(path=path, data=save_data, detail=f_detail)
+            return True, True
 
     def save_json(path: str, data: dict, detail: str = '') -> bool:
         if not (path := FileIO.check_default(path=path, func_name=f'{FileIO.check_detail(detail)}save_json'))[0]:

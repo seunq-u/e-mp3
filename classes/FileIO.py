@@ -52,12 +52,16 @@ class FileIO():
     def _task_error_comment(error: str):
         return f'[{str(datetime.datetime.now())}] {error}'
 
-    def merge_dict(original_dict, dict):
+    def merge_dict(original_dict, m_dict):
         merged_dict = copy.deepcopy(original_dict)
 
-        for key, value in dict.items():
+        for key, value in m_dict.items():
             if key in merged_dict and isinstance(merged_dict[key], list):
                 merged_dict[key].extend(value)
+
+            elif key in merged_dict and isinstance(merged_dict[key], dict):
+                merged_dict[key] = FileIO.merge_dict(merged_dict[key], value)
+
             else:
                 merged_dict[key] = value
 

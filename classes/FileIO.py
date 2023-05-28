@@ -14,18 +14,14 @@ import orjson
 from os.path import isfile
 from os import rename, remove
 from libs import logger
-from pydantic.utils import deep_update
+import copy
 import datetime
 
 class os:
     pass
 
 os.isfile, os.rename, os.remove = isfile, rename, remove
-rename, isfile, remove = None, None, None
-# class FileIOError():
-#     class WrongORDisallowedPath(Exception):
-#         def __str__(self):
-#             return "Wrong or Disallowed Path Error"
+isfile, rename, remove = None, None, None
 
 class FileIO():
     """파일 입출력 클래스
@@ -56,6 +52,16 @@ class FileIO():
     def _task_error_comment(error: str):
         return f'[{str(datetime.datetime.now())}] {error}'
 
+    def merge_dict(original_dict, dict):
+        merged_dict = copy.deepcopy(original_dict)
+
+        for key, value in dict.items():
+            if key in merged_dict and isinstance(merged_dict[key], list):
+                merged_dict[key].extend(value)
+            else:
+                merged_dict[key] = value
+
+        return merged_dict
 
     def check_default(path: str, func_name: str = '???') -> tuple[bool, str]:
         if FileIO._check_secure_path(path=path, func_name=func_name):
@@ -114,7 +120,7 @@ class FileIO():
         if file_data is False:
             return False
         try:
-            save_data = deep_update(file_data, update_data)
+            save_data = FileIO.merge_dict(file_data, update_data)
         except Exception as e:
             logger.error(log=f"Error {e}", detail=f'FileIO.{FileIO.check_detail(detail)}edit_json')
             return False

@@ -120,7 +120,7 @@ class FileIO():
             logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
             return (False, f"FileIO.{FileIO.check_detail(detail)}read_json {e}")
 
-    def edit_json(path: str, update_data: dict, detail: str = '') -> tuple[bool, typing.Any]:
+    def edit_json(path: str, data: dict, detail: str = '') -> tuple[bool, typing.Any]:
         f_detail = detail + '.edit_json'
         file_data = FileIO.read_json(path=path, detail=f_detail)
 
@@ -128,7 +128,7 @@ class FileIO():
             return False, FileIO._task_error_comment(file_data[1])
 
         try:
-            save_data = FileIO.merge_dict(file_data[0], update_data)
+            save_data = FileIO.merge_dict(file_data[0], data)
 
         except Exception as e:
             logger.error(log=f"Error {e}", detail=f'FileIO.{FileIO.check_detail(detail)}edit_json')

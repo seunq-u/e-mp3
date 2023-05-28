@@ -90,7 +90,8 @@ Lavalink_3.4.0_1350.jar
 application.yml
 
 # Test File
-test.py
+# test.py
+cogs/test.py
 
 # Font
 *.ttf

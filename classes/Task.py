@@ -24,7 +24,7 @@ class StatusManager():
         return cls.__Status
 
     @classmethod 
-    def add_task(cls, id: str, data: dict) -> None:
+    def add_task(cls, id: typing.Union[str, int], data: dict) -> None:
         new_task = Task(
             id = id,
             data = data,
@@ -35,7 +35,7 @@ class StatusManager():
         cls.status.update({id: new_task})
 
     @classmethod 
-    def get_task(cls, id: str) -> Task:
+    def get_task(cls, id: typing.Union[str, int]) -> Task:
         try:
             task = cls.status[id]
         except KeyError:
@@ -45,7 +45,7 @@ class StatusManager():
             return task
 
     @classmethod 
-    def set_task(cls, id: str, status: typing.Literal['waiting', 'in progress', 'done'], result: typing.Union[None, bool] = None, comment: typing.Union[None, str] = None):
+    def set_task(cls, id: typing.Union[str, int], status: typing.Literal['waiting', 'in progress', 'done'], result: typing.Union[None, bool] = None, comment: typing.Union[None, str] = None):
         task = cls.get_task(id=id)
         task.status = status
         task.result = result

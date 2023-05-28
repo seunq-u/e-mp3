@@ -16,7 +16,6 @@ import config
 import lavalink
 import subprocess
 import time, sys
-from libs import playlist
 import argparse
 
 parser = argparse.ArgumentParser()

@@ -79,16 +79,15 @@ class DataManager():
                     if self.QueueManager.queue[i].qsize() != 0:
                         data = self.QueueManager.get_task(thread_number=i)
 
-                    # # 멀티 스레딩
-                    # new_thread = threading.Thread(target=data.get('Instruct'), name=f"thread.{i}?{data.get('Identifier')}", args=(data, ))
-                    # new_thread.daemon = False # 메인 스레드가 종료되어도 I/O 작업은 계속하고 마침
-                    # new_thread.start()
+                        # # 멀티 스레딩
+                        # new_thread = threading.Thread(target=data.get('Instruct'), name=f"thread.{i}?{data.get('Identifier')}", args=(data, ))
+                        # new_thread.daemon = False # 메인 스레드가 종료되어도 I/O 작업은 계속하고 마침
+                        # new_thread.start()
 
-                    # 멀티 프로세싱
-                    self.StatusManager.set_task(id = data.get('Identifier'), status='in progress')  
-                    executor.submit(data.get('Instruct'), data)
-                    print(f'start threading / {data.get("InstructName")} / in thread.{i}. to {data.get("Identifier")}')
-
+                        # 멀티 프로세싱
+                        self.StatusManager.set_task(id = data.get('Identifier'), status='in progress')  
+                        executor.submit(data.get('Instruct'), data)
+                        print(f'start threading / {data.get("InstructName")} / in thread.{i}. to {data.get("Identifier")}')
         # executor.shutdown()
 
 

@@ -10,6 +10,8 @@ It's a collection of command instruction (and creation class) used in the DBMS
 ###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
+import time
+import typing
 from classes.FileIO import FileIO
 from classes.Task import StatusManager
 
@@ -20,6 +22,9 @@ class Instruction():
     def __init__(self) -> None:
         pass
 
+    def get_path_from_identifier(id: str) -> str:
+        return id.split('?t=')[0]
+
     def remove_identifier(func):
         def wrapper(data: dict, *args):
             data.pop("Instruct")
@@ -28,8 +33,8 @@ class Instruction():
 
     # 자주 사용되는 함수
     def alter_user(data: dict, *args):
-        print(data)
-        if (result := FileIO.edit_json(path=f"DB//user//{data.get('Identifier')}.json", data=data))[0]:
+        id_removed_time = Instruction.get_path_from_identifier(id = data.get('Identifier'))
+        if (result := FileIO.edit_json(path=f"DB//user//{id_removed_time}.json", data=data))[0]:
             StatusManager.set_task(
                 id = data.get('Identifier'),
                 status='done',
@@ -47,7 +52,8 @@ class Instruction():
     # <<--- 유저 명령 모음 --->>
     @remove_identifier
     def create_account(data: dict, *args):
-        if (result := FileIO.make_json(path="DB//user//", name=data.get('user_id'), data=data))[0]:
+        id_removed_time = Instruction.get_path_from_identifier(id = data.get('Identifier'))
+        if (result := FileIO.make_json(path="DB//user//", name=id_removed_time, data=data))[0]:
             StatusManager.set_task(
                 id = data.get('Identifier'),
                 status='done',
@@ -159,12 +165,15 @@ class CreateInstruction():
     """
     # <<<--- user --->>>
 
+    def new_id(id: typing.Union[str, int]):
+        return f'{id}?t={time.time()}'
+
     def create_account(user_id: int, nickname: str, terms: tuple[bool, bool, bool]):
         # 리턴으로 dict 형 data가 나옴
         data = {
             "Instruct" : Instruction.create_account,
             "InstructName" : 'create_account',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "user_id" : user_id,
             "nickname" : nickname,
             "terms" : {
@@ -184,7 +193,7 @@ class CreateInstruction():
         data = {
             "Instruct" : Instruction.alter_nickname,
             "InstructName" : 'alter_nickname',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "nickname" : nickname
         }
         return data
@@ -196,7 +205,7 @@ class CreateInstruction():
         data = {
             "Instruct" : Instruction.alter_terms_pp,
             "InstructName" : 'alter_terms_pp',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "terms" : {
                 "policy_privacy" : term_pp,
             }
@@ -207,7 +216,7 @@ class CreateInstruction():
         data = {
             "Instruct" : Instruction.alter_terms_tos,
             "InstructName" : 'alter_terms_tos',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "terms" : {
                 "terms_of_service" : term_tos,
             }
@@ -218,7 +227,7 @@ class CreateInstruction():
         data = {
             "Instruct" : Instruction.alter_trems_mc,
             "InstructName" : 'alter_trems_mc',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "terms" : {
                 "marketing_consent" : term_mc
             }
@@ -229,7 +238,7 @@ class CreateInstruction():
         data = {
             "Instruct" : Instruction.add_playlist,
             "InstructName" : 'add_playlist',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "playlist" : [playlist_uuid]
         }
         return data
@@ -241,7 +250,7 @@ class CreateInstruction():
         data = {
             "Instruct" : Instruction.add_bookmark,
             "InstructName" : 'add_bookmark',
-            "Identifier" : user_id,
+            "Identifier" : CreateInstruction.new_id(user_id),
             "bookmark" : [playlist_uuid]
         }
         return data

@@ -1,3 +1,4 @@
+import time
 import typing
 from queue import Queue
 import config
@@ -10,6 +11,8 @@ class Task:
     status: typing.Literal['waiting', 'in progress', 'done']
     result: typing.Union[None, bool]
     comment: typing.Union[None, str]
+    after_func: typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any]
+    after_func_args: tuple
 
 class StatusManager():
     """작업을 추적하기 위해, 작업 객체는 작업에 대한 정보와 상태를 포함하고, 작업이 완료되면 해당 객체의 상태를 업데이트. / 
@@ -24,18 +27,32 @@ class StatusManager():
         return cls.__Status
 
     @classmethod 
-    def add_task(cls, id: typing.Union[str, int], data: dict) -> None:
+    def add_task(cls, id: str, data: dict, after_func: typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any], after_func_args: tuple) -> str:
+        """새로운 DB 작업을 추가하는 메서드
+
+        Args:
+            id (typing.Union[str, int]): 작업의 식별자 -> playlist uuid / user id
+
+            data (dict): DBMS 용 명령어 (Classes.Instruction.CreatInstruction)
+
+            after_func (typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any]): 해당 작업이 완료 (status.done) 될 때 실행할 함수
+
+            after_func_args (tuple): 해당 함수의 변수 
+        """
+
         new_task = Task(
             id = id,
             data = data,
             status = 'waiting',
             result = None,
-            comment = None
+            comment = None,
+            after_func = after_func,
+            after_func_args = after_func_args,
         ) 
         cls.status.update({id: new_task})
 
     @classmethod 
-    def get_task(cls, id: typing.Union[str, int]) -> Task:
+    def get_task(cls, id: str) -> Task:
         try:
             task = cls.status[id]
         except KeyError:
@@ -45,12 +62,13 @@ class StatusManager():
             return task
 
     @classmethod 
-    def set_task(cls, id: typing.Union[str, int], status: typing.Literal['waiting', 'in progress', 'done'], result: typing.Union[None, bool] = None, comment: typing.Union[None, str] = None):
+    def set_task(cls, id: str, status: typing.Literal['waiting', 'in progress', 'done'], result: typing.Union[None, bool] = None, comment: typing.Union[None, str] = None):
         task = cls.get_task(id=id)
         task.status = status
         task.result = result
         task.comment = comment
-
+        if task.status == "done":
+            task.after_func(task.after_func_args, task.result, task.comment)
 
 
 
@@ -78,8 +96,8 @@ class QueueManager():
     def id_queue(self) -> dict:
         return self.__task_id_queue
 
-    def _check_id_queue(self, id: typing.Union[str, int]) -> typing.Union[None, int]:
-        """id가 self.__task_id_queue 에 있는지 검사
+    def _check_id_queue(self, id: str) -> typing.Union[None, int]:
+        """id가 self.__task_id_queue 에 있는지 검사 -> 없음(none) or Queue 번호
         """
         for i in range(config.DBMS.task_thread_count):
             if id in self.id_queue[i]:
@@ -87,7 +105,7 @@ class QueueManager():
         else:
             return None
 
-    def _dlt_id_queue(self, id: typing.Union[str, int]) -> bool:
+    def _dlt_id_queue(self, id: str) -> bool:
         for i in range(config.DBMS.task_thread_count):
             if id in self.id_queue[i]:
                 self.id_queue[i].remove(id)
@@ -99,14 +117,14 @@ class QueueManager():
         count = dict()
         for i in range(config.DBMS.task_thread_count):
             count.update({i: self.queue[i].qsize()})
-        
+
         min_index = min(count, key=count.get)
-        
+
         return self.queue[min_index], min_index
 
 
 
-    def put_task(self, id: typing.Union[str, int], data: dict) -> None:
+    def put_task(self, id: str, data: dict) -> None:
         checkValue = self._check_id_queue(id)
         # 만약 있을 경우
         if type(checkValue) == int:
@@ -131,3 +149,4 @@ class QueueManager():
 class TaskNotFound(Exception):
     def __init__(self, task_id: str, data: dict) -> None:
         super().__init__(f'Not Fount Task({task_id}) - {data}')
+

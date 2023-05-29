@@ -55,12 +55,17 @@ class DataManager():
         return self.__QueueManager
 
 
-    def put(self, data: dict):
+    def put(self, data: dict, after_func: typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any], after_func_args: tuple):
         """입력 함수
 
         Args:
             id (typing.Union[int, str]): playlist uuid(str) or discord user id(int)
+
             data (dict): {"Instruct" : Instruction.~ , "Identifier" : user_id | playlist_uuid, ...}
+
+            after_func (typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any]): 해당 작업이 완료 (status.done) 될 때 실행할 함수
+
+            after_func_args (tuple): 해당 함수의 변수 
         """
 
         id = data.get('Identifier')
@@ -68,7 +73,7 @@ class DataManager():
         self.QueueManager.put_task(id=id, data=data)
 
         # 상태 추가
-        self.StatusManager.add_task(id=id, data=data)
+        self.StatusManager.add_task(id=id, data=data, after_func=after_func, after_func_args=after_func_args)
 
 
     def update(self, *args):

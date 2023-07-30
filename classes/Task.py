@@ -122,17 +122,6 @@ class QueueManager():
 
         return self.queue[min_index], min_index
 
-
-    def _debug_get_jobs_in_each_queue_count(self) -> None:
-        """## DEBUG FUNC
-        - 각 큐에 있는 작업 개수와 총 작업 개수, 큐 개수 출력
-        - config.DEBUG가 True 일 경우에만 작동
-
-        """
-        if config.DEBUG:
-            print(f"EachQueueSize: {(task := [i.qsize() for i in self.queue.values()])} | TotalTaskCount: {sum(task)} | QueueCount: {config.DBMS.task_thread_count}")
-
-
     def put_task(self, id: str, data: dict) -> None:
         checkValue = self._check_id_queue(id)
         # 만약 있을 경우
@@ -152,6 +141,19 @@ class QueueManager():
         task: dict = self.queue[thread_number].get(timeout=80)
         self._dlt_id_queue(task.get('Identifier'))
         return task
+
+    def get_current_tasks_count(self):
+        return sum([i.qsize() for i in self.queue.values()])
+
+
+    def _debug_prt_jobs_in_each_queue_count(self) -> None:
+        """## DEBUG FUNC
+        - 각 큐에 있는 작업 개수와 총 작업 개수, 큐 개수 출력
+        - config.DEBUG가 True 일 경우에만 작동
+
+        """
+        if config.DEBUG:
+            print(f"EachQueueSize: {(task := [i.qsize() for i in self.queue.values()])} | TotalTaskCount: {sum(task)} | QueueCount: {config.DBMS.task_thread_count}")
 
 
 

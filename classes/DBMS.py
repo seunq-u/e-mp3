@@ -22,7 +22,7 @@ from multipledispatch import dispatch
 from queue import Queue
 from classes import Task
 import concurrent.futures
-
+from libs import logger
 
 class Counter:
     COUNT = 0
@@ -34,26 +34,26 @@ COUNTER = Counter()
 
 class DataManager():
     _instance = None
-    _isin = False
     def __init__(self) -> None:
         raise RuntimeError("Please Call instance() instead.")
 
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            print('Creating new instance')
+            logger.info('Creating new instance', detail='instance')
             cls._instance = cls.__new__(cls)
+            cls._startTime = time.time()
+            cls.__running = True
+            logger.info(f'Starting DBMS <{cls.__running=}, {cls._startTime=}>', detail='instance')
 
             cls.__StatusManager = Task.StatusManager()
             cls.__QueueManager = Task.QueueManager()
-            cls._isin = True
 
-            new_thread_updater = threading.Thread(target=cls.update, name=f"DBMS", args=(cls._instance,))
+            new_thread_updater = threading.Thread(target=cls.update, name=f"DBMS_UPDATER", args=(cls._instance,))
             # new_thread.daemon = False # 메인 스레드가 종료되어도 I/O 작업은 계속하고 마침
             new_thread_updater.start()
-            
-            if config.DEBUG:
-                threading.Thread(target=cls._debug_print_task_count, name=f"DBMS_COUNTER", args=( )).start()
+
+            if config.DEBUG: threading.Thread(target=cls._debug_print_task_count, name=f"DBMS_COUNTER", args=(cls._instance, )).start()
 
             # cls.update(cls._instance) # multiprocessing
         return cls._instance
@@ -67,6 +67,13 @@ class DataManager():
     def QueueManager(self):
         return self.__QueueManager
 
+    @property
+    def running(self):
+        return self.__running
+
+    @running.setter
+    def running(self, value: bool):
+        self.__running = value
 
     def put(self, data: dict, after_func: typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any], after_func_args: tuple):
         """입력 함수
@@ -90,12 +97,16 @@ class DataManager():
 
 
     def update(self, *args):
-        print('Start DBMS')
+        logger.info('Start DBMS.update()')
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            while self._isin:
+            while True:
+                if not self.running: executor.shutdown(); break
+
                 for i in range(config.DBMS.task_thread_count):
+                    if not self.running: break
+
                     if self.QueueManager.queue[i].qsize() != 0:
-                        # self.QueueManager._debug_get_jobs_in_each_queue_count()
+                        # self.QueueManager._debug_prt_jobs_in_each_queue_count()
                         data = self.QueueManager.get_task(thread_number=i)
 
                         # # 멀티 스레딩
@@ -116,9 +127,38 @@ class DataManager():
                             COUNTER.TIME = int(time.time())
         # executor.shutdown()
 
-    def _debug_print_task_count():
+
+    def stop(self):
+        """## DBMS.stop
+        - DBMS Shutdown Worker thread로 호출하여 작업중 종료되는 일이 없도록 제어(DBMS.__shutdown_worker)
+        """
+        shutdown_thread = threading.Thread(target=self.__shutdown_worker, name=f"ShutdownWorker?t={time.time()}", args=(self, ))
+        shutdown_thread.daemon = False
+        logger.info('waiting DBMS shutdown...', name='DBMS', detail='stop')
+        shutdown_thread.start()
+
+    def __shutdown_worker(self, *args):
+        """DBMS.QueueManager의 각 queue 들이 비워질 때까지 0.2 초 간격으로 검사하고, 그 후 DBMS를 종료
+        """
+        waiting_time = 0.0
+        while True:
+            print(self.QueueManager.get_current_tasks_count())
+            logger.info(f'waiting DBMS shutdown... for {waiting_time:.1f}s', name='DBMS', detail='__shutdown_worker.daemonThread')
+            if self.QueueManager.get_current_tasks_count() == 0:
+                self.running = False
+                logger.info(f'DBMS is shutdowned...', name='DBMS', detail='__shutdown_worker.daemonThread')
+
+                break
+
+            time.sleep(0.1)
+            waiting_time += 0.1
+
+
+    def _debug_print_task_count(self, *args):
         while True: 
-            print(f"DBMS SPEED : {COUNTER.COUNT} file/s")
+            if not self.running: break
+
+            logger.debug(f"DBMS SPEED : {COUNTER.COUNT} file/s", detail='DBMS_COUNTER')
 
             if COUNTER.TIME != int(time.time()):
                 COUNTER.COUNT = 0

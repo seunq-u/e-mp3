@@ -1,5 +1,5 @@
 """
-# <classes/Playlist.py>
+# <classes.Playlist.py>
 ## E-Mp3 Bot Playlist 클래스
 
 * BasePlaylist

@@ -5,50 +5,62 @@
 ###### ⓒ 2023. ManGGo.ß STUDIO All rights reserved.
 """
 
+
+"""
+⭐수정이 필요한 부분을 꼭 확인해 주세요⭐
+"""
+
 # <<--- Bot --->>
+# 필수 수정
 NAME = "BOTNAME"
 ID = "BOTID"
 DESCRIPTION = """BOT DESCRIPTION"""
-SHARD_COUNT = 1 # 샤드 개수 (최소 1, 1000~2500 서버당 1개 추가 권장)
+SHARD_COUNT = 1 # 샤드 개수 (최소 1, 1000~2500 서버당 1개 추가 권장) 
+
+# 선택 수정
 PREFIX = f"{NAME}/"
 DEBUG = False
-TOKEN = "TOKEN"
-
+TOKEN = "YOUR_BOT_TOKEN"
 def ACTIVITY(self):
     return [
         f"🎵 {len(self.guilds)}곳에서 같이 노래 듣는중..",
         "🔍 좋은 음악 찾아 다니는중..",
         "❗ /help로 도움말을 확인할 수 있어요!"
-        "📜 플리 작성중..",
+        "📜 플리 작성중..", 
     ]
 
-# 코그 이름 (cogs/ 파일이름이 아닌 코그의 클래스 이름으로 작성+대소문자 유의)
-COGS = [
+COGS = [  # 코그 이름 (cogs/ 파일이름이 아닌 코그의 클래스 이름으로 작성+대소문자 유의) 
     'e_mp3',
     'Music'
-]
+] # 새로운 cogs 를 추가하지 않았다면 건드리지 않는 것이 좋아요.
 COGS.sort()
 
 
 # <<--- Admin --->>
+# 필수 수정
 ADMINS = [
-    # 봇의 관리자 ID
+    # 봇의 관리자 DISCORD ID (int)
 ]
-DEV_GUILD = 0 # 관리자 명령어가 표시되는 서버 ID
+DEV_GUILD = 0 # 관리자 명령어가 표시되는 서버 ID 
 
 
 # <<--- Emoji --->>
+# 추후 안내
 class Emoji:
     okay = '<:O_:1>'
     unknown = '<:Unknown:2>'
     no = '<:X_:3>'
 
 
+
 # <<--- Lavalink --->>
 class Lavalink_DATA:
+    # 필수 수정
     HOST = "localhost"
     PORT = 2333
     PASSWORD = "YourLavalinkPassword"
+
+    # 선택 수정 (비추)
     SSL = False
     REGION = "kr"
     NAME = f"{NAME}_{ID}_BOT"
@@ -56,6 +68,31 @@ class Lavalink_DATA:
     RESUME_TIMEOUT = 300
 
 
+
+# <<--- Logger --->>
+# 선택 수정
+class Logger:
+    # 로그 저장
+    SaveLog = True # 로그 파일 저장 여부
+    SaveLogPath = 'logs/' # 로그 파일 저장 디렉터리
+
+    # 개발 중 / 로그 파일 압축
+    CompressionLog = False # 로그 파일 압축 여부
+    CompressionLogUnit = 7 # 로그 파일 압축 단위 (일·日·day)
+
+    # 로그 컬러
+    END_COLOR = '\033[0m'
+    log_color = {
+        "debug" : ('\033[90m', END_COLOR), # GRAY
+        "info" : ('\033[92m', END_COLOR), # GREEN
+        "warn" : ('\033[93m', END_COLOR), # YELLOW
+        "error" : ('\033[91m', END_COLOR), # RED
+        "crit" : ('\033[5m\033[1m\033[4m\033[3m\033[31m', END_COLOR) # BOLD, BLINKING, UNDERLINE, ITALIC
+    }
+
+
+
 # <<--- DBMS --->>
 class DBMS:
-    task_thread_count = 12
+    # 선택 수정
+    task_thread_count = 12 # File IO 작업이 이루어지는 queue와 thread 개수예요. 큰 문제가 없다면 수정하지 않는 게 좋아요.

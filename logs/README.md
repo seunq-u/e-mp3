@@ -1,0 +1,37 @@
+# Logger - logs directory
+
+- 메모장보다는 Markdown 미리보기가 가능한 Visual Studio Code 나 Github 또는 기타 코드 에디터(마크다운 리더기)로 읽는 것을 추천해요.
+- 2023-07-30 폴더와 그 속의 .log 파일들은 테스트로 생성된 파일이에요.
+
+|단계|의미|파일 접두사|조건|
+|:--:|:--|:--:|:--:|
+|DEBUG|디버그 로그, 프로그램 동작등을 상세히 기록하는 단계|debug_|config.DEBUG = True|
+|INFO|일반적인 정보를 기록하는 단계|info_|❌|
+|WARN|잠재적인 문제를 일으킬 수 있는 문제들을 기록하는 단계|warn_|❌|
+|ERROR|치명적인 오류, 예기치 못한 오류나 런타임 예외 등을 기록하는 단계|error_|❌|
+|CRIT|ERROR 와 마찬가지로 치명적인 오류의 단계이며, 프로그램이 정상적인 동작을 할 수 없으며 즉각 초치해야 되는 오류를 기록하는 단계|error_|❌|
+
+## 디렉토리 구조
+
+- 모든 레벨의 파일이 모두 존재하지 않을 수도 있어요 ☺️
+
+    ```bash
+    E-MP3
+    ├── logs
+    │   └── yy-mm-dd
+    │       ├── debug_yy-mm-dd.log
+    │       ├── info_yy-mm-dd.log
+    │       ├── warn_yy-mm-dd.log
+    │       └── error_yy-mm-dd.log
+    └── ...
+    ```
+
+### ·
+
+#### ··
+
+##### ···
+
+###### from E-MP3/README.md
+
+ⓒ 2023. ManGGo.ß STUDIO All rights reserved.

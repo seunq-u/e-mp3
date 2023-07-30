@@ -1,5 +1,5 @@
 """
-## libs.FileIO.py  
+## classes.FileIO.py  
 Directly access and manipulate of json file(user data, player data, etc. )
 
 ### func, class and value
@@ -13,7 +13,7 @@ import typing
 import orjson
 from os.path import isfile
 from os import rename, remove
-from libs import logger
+from classes.Logger import Logger
 import copy
 import datetime
 
@@ -31,12 +31,12 @@ class FileIO():
         if path_up.startswith(('DB/', 'DB//', '''DB\\''')):
             return True
         else:
-            logger.error(log=f"Wrong or Disallowed Path Error : {path}", detail=f"FileIO._check_secure_path.{func_name}")
+            Logger.error(log=f"Wrong or Disallowed Path Error : {path}", detail=f"FileIO._check_secure_path.{func_name}")
             return False
 
     def _check_true_path(path: str, func_name: str = '???') -> bool:
         if not os.isfile(f'{path}'):
-            logger.warn(log=f"Not Found Path : {path}", detail=f"FileIO._check_true_path.{func_name}")
+            Logger.warn(log=f"Not Found Path : {path}", detail=f"FileIO._check_true_path.{func_name}")
             return False
         return True
 
@@ -47,7 +47,7 @@ class FileIO():
                 return (path + ('.json'))
             return path
         except Exception as e:
-            logger.warn(log=f"Error : {e}", detail=f"FileIO._add_json_extension.{func_name}")
+            Logger.warn(log=f"Error : {e}", detail=f"FileIO._add_json_extension.{func_name}")
 
     def _task_error_comment(error: str):
         return f'[{str(datetime.datetime.now())}] {error}'
@@ -96,11 +96,11 @@ class FileIO():
                 return True, True
 
             except Exception as e:
-                logger.warn(log=f'{e}', detail=f'{FileIO.check_detail(detail)}make_json')
+                Logger.warn(log=f'{e}', detail=f'{FileIO.check_detail(detail)}make_json')
                 return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] {e}')
 
         else:
-            logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{FileIO.check_detail(detail)}make_json")
+            Logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{FileIO.check_detail(detail)}make_json")
             return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] Path Should be ended by / or // or \\')
 
     def read_json(path: str, detail: str = '') -> typing.Tuple[typing.Union[dict, bool], typing.Union[str, None]]:
@@ -113,11 +113,11 @@ class FileIO():
             return (data, )
 
         except orjson.JSONDecodeError as e:
-            logger.warn(log=f'JSONDecodeError: {e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
+            Logger.warn(log=f'JSONDecodeError: {e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
             return (False, f"FileIO.{FileIO.check_detail(detail)}read_json {e}")
 
         except Exception as e:
-            logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
+            Logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
             return (False, f"FileIO.{FileIO.check_detail(detail)}read_json {e}")
 
     def edit_json(path: str, data: dict, detail: str = '') -> typing.Tuple[bool, typing.Any]:
@@ -131,7 +131,7 @@ class FileIO():
             save_data = FileIO.merge_dict(file_data[0], data)
 
         except Exception as e:
-            logger.error(log=f"Error {e}", detail=f'FileIO.{FileIO.check_detail(detail)}edit_json')
+            Logger.error(log=f"Error {e}", detail=f'FileIO.{FileIO.check_detail(detail)}edit_json')
             return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}edit_json] {e}')
 
         else:
@@ -147,7 +147,7 @@ class FileIO():
                 f.write(orjson.dumps(data))
             return True
         except Exception as e:
-            logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}save_json")
+            Logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}save_json")
             return False
 
 
@@ -165,7 +165,7 @@ class FileIO():
             os.rename(old_name_p, new_name_p)
             return True
         except Exception as e:
-            logger.error(log=f'Rename Error: {e}', detail=f'{FileIO.check_detail(detail)}.rename_json')
+            Logger.error(log=f'Rename Error: {e}', detail=f'{FileIO.check_detail(detail)}.rename_json')
             return False
 
 
@@ -177,5 +177,5 @@ class FileIO():
             os.remove(path)
             return True
         except Exception as e:
-            logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}remove_json")
+            Logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}remove_json")
             return False

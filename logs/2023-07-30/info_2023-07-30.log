@@ -1,0 +1,11 @@
+2023-07-30 19:22:51.268 / [INFO] [E-Mp3.main]: test log
+2023-07-30 19:22:54.863 / [INFO] [E-Mp3.main]: test log
+2023-07-30 19:24:20.453 / [INFO] [EP3BOT.terminal]: test log
+2023-07-30 19:24:55.129 / [INFO] [EP3BOT.main.terminal]: log
+2023-07-30 19:29:57.949 / [INFO] [LoggerClass.MainCode]: test log from libs/Logger
+2023-07-30 19:48:35.993 / [INFO] [E-Mp3.instance]: Creating new instance
+2023-07-30 19:48:35.994 / [INFO] [E-Mp3.instance]: Starting DBMS <cls.__running=True, cls._startTime=1690714115.994153>
+2023-07-30 19:48:35.995 / [INFO] [E-Mp3.main]: Start DBMS.update()
+2023-07-30 19:48:53.810 / [INFO] [DBMS.stop]: waiting DBMS shutdown...
+2023-07-30 19:48:54.045 / [INFO] [DBMS.__shutdown_worker.daemonThread]: waiting DBMS shutdown... for 0.0s
+2023-07-30 19:48:54.154 / [INFO] [DBMS.__shutdown_worker.daemonThread]: DBMS is shutdowned...

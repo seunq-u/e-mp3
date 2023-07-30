@@ -1,5 +1,5 @@
 """
-## libs.Instruction.py  
+## classes.Instruction.py  
 It's a collection of command instruction (and creation class) used in the DBMS
 
 ### func, class and value

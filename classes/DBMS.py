@@ -1,5 +1,5 @@
 """
-## libs.FileIO.py  
+## classes.FileIO.py  
 It's manage files in/out and protecting from json encoder and decoder's error
 
 ### func, class and value
@@ -21,8 +21,8 @@ import config
 from multipledispatch import dispatch
 from queue import Queue
 from classes import Task
+from classes.Logger import Logger
 import concurrent.futures
-from libs import logger
 
 class Counter:
     COUNT = 0
@@ -40,11 +40,11 @@ class DataManager():
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            logger.info('Creating new instance', detail='instance')
+            Logger.info('Creating new instance', detail='instance')
             cls._instance = cls.__new__(cls)
             cls._startTime = time.time()
             cls.__running = True
-            logger.info(f'Starting DBMS <{cls.__running=}, {cls._startTime=}>', detail='instance')
+            Logger.info(f'Starting DBMS <{cls.__running=}, {cls._startTime=}>', detail='instance')
 
             cls.__StatusManager = Task.StatusManager()
             cls.__QueueManager = Task.QueueManager()
@@ -97,7 +97,7 @@ class DataManager():
 
 
     def update(self, *args):
-        logger.info('Start DBMS.update()')
+        Logger.info('Start DBMS.update()')
         with concurrent.futures.ThreadPoolExecutor() as executor:
             while True:
                 if not self.running: executor.shutdown(); break
@@ -134,7 +134,7 @@ class DataManager():
         """
         shutdown_thread = threading.Thread(target=self.__shutdown_worker, name=f"ShutdownWorker?t={time.time()}", args=(self, ))
         shutdown_thread.daemon = False
-        logger.info('waiting DBMS shutdown...', name='DBMS', detail='stop')
+        Logger.info('waiting DBMS shutdown...', name='DBMS', detail='stop')
         shutdown_thread.start()
 
     def __shutdown_worker(self, *args):
@@ -142,11 +142,10 @@ class DataManager():
         """
         waiting_time = 0.0
         while True:
-            print(self.QueueManager.get_current_tasks_count())
-            logger.info(f'waiting DBMS shutdown... for {waiting_time:.1f}s', name='DBMS', detail='__shutdown_worker.daemonThread')
+            Logger.info(f'waiting DBMS shutdown... for {waiting_time:.1f}s', name='DBMS', detail='__shutdown_worker.daemonThread')
             if self.QueueManager.get_current_tasks_count() == 0:
                 self.running = False
-                logger.info(f'DBMS is shutdowned...', name='DBMS', detail='__shutdown_worker.daemonThread')
+                Logger.info(f'DBMS is shutdowned...', name='DBMS', detail='__shutdown_worker.daemonThread')
 
                 break
 
@@ -158,7 +157,7 @@ class DataManager():
         while True: 
             if not self.running: break
 
-            logger.debug(f"DBMS SPEED : {COUNTER.COUNT} file/s", detail='DBMS_COUNTER')
+            Logger.debug(f"DBMS SPEED : {COUNTER.COUNT} file/s", detail='DBMS_COUNTER')
 
             if COUNTER.TIME != int(time.time()):
                 COUNTER.COUNT = 0

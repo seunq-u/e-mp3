@@ -21,7 +21,7 @@ class W:
     FileIO_M_E_Test = 2, # FileIO Class 생성, 수정 테스트
     FileIO_Test_EditJson = 3, # FileIO Class 수정 테스트
     EditFileUser = 4, # DBMS - Instruction User 생성, 닉네임변경, 약관(개인정보, 정책, 마케팅) 동의/철회, 플리 추가(생성X) x2, 북마크 추가 x2
-    OldE = 10293, # EditFileUser 구버전
+    __OldE = float('NaN'), # EditFileUser 구버전
     MassiveQueueJobs = 5, # 대량 큐 작업
 
 WHAT = W.MassiveQueueJobs
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                 )
         )
 
-    elif WHAT == W.OldE: # 미사용
+    elif WHAT == W.__OldE: # 미사용
         aft_func = lambda args, result, comment : print(f"    {args=}, {result=}, {comment=}")
         aft_func_arg = ("from AfterFunc 일1일1이2오5", )
 

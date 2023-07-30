@@ -67,7 +67,7 @@ class FileIO():
 
         return merged_dict
 
-    def check_default(path: str, func_name: str = '???') -> tuple[bool, str]:
+    def check_default(path: str, func_name: str = '???') -> typing.Tuple[bool, str]:
         if FileIO._check_secure_path(path=path, func_name=func_name):
             path = FileIO._add_json_extension(path=path, func_name=func_name)
             if FileIO._check_true_path(path=path, func_name=func_name):
@@ -82,7 +82,7 @@ class FileIO():
 
 
 
-    def make_json(path: str, name: str, data: dict = {}, detail: str = '') -> tuple[bool, typing.Any]:
+    def make_json(path: str, name: str, data: dict = {}, detail: str = '') -> typing.Tuple[bool, typing.Any]:
         if path.endswith(('/', '//', '''\\''')): # 제대로 path 가 제대로 된 형식인지 확인
             name = FileIO._add_json_extension(name)
             path_n = path + name
@@ -103,7 +103,7 @@ class FileIO():
             logger.warn(log=f'Path Should be ended by / or // or \\', detail=f"FileIO.{FileIO.check_detail(detail)}make_json")
             return False, FileIO._task_error_comment(f'[FileIO.{FileIO.check_detail(detail)}make_json] Path Should be ended by / or // or \\')
 
-    def read_json(path: str, detail: str = '') -> tuple[typing.Union[dict, bool], typing.Union[str, None]]:
+    def read_json(path: str, detail: str = '') -> typing.Tuple[typing.Union[dict, bool], typing.Union[str, None]]:
         if not (path := FileIO.check_default(path=path, func_name=f'{FileIO.check_detail(detail)}read_json'))[0]:
             return (False, f'Not Fount File in {path}')
         try:
@@ -120,7 +120,7 @@ class FileIO():
             logger.warn(log=f'{e}', detail=f"FileIO.{FileIO.check_detail(detail)}read_json")
             return (False, f"FileIO.{FileIO.check_detail(detail)}read_json {e}")
 
-    def edit_json(path: str, data: dict, detail: str = '') -> tuple[bool, typing.Any]:
+    def edit_json(path: str, data: dict, detail: str = '') -> typing.Tuple[bool, typing.Any]:
         f_detail = detail + '.edit_json'
         file_data = FileIO.read_json(path=path, detail=f_detail)
 

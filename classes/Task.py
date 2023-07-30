@@ -11,15 +11,15 @@ class Task:
     status: typing.Literal['waiting', 'in progress', 'done']
     result: typing.Union[None, bool]
     comment: typing.Union[None, str]
-    after_func: typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any]
-    after_func_args: tuple
+    after_func: typing.Union[None, typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str], typing.Any], typing.Any] ]
+    after_func_args: typing.Union[tuple, None]
 
 class StatusManager():
     """작업을 추적하기 위해, 작업 객체는 작업에 대한 정보와 상태를 포함하고, 작업이 완료되면 해당 객체의 상태를 업데이트. / 
     작업 객체에 status : '대기 중(waiting)', '진행 중(in progress)', '완료(done)' | result : 대기/실행: None, 성공: True, 실패: False
     와 같은 상태를 부여하여 작업 상태를 확인 가능
     """
-    __Status = dict()
+    __Status = dict() # StatusManager.__Status or cls.__Status
 
     @classmethod
     @property
@@ -27,7 +27,7 @@ class StatusManager():
         return cls.__Status
 
     @classmethod 
-    def add_task(cls, id: str, data: dict, after_func: typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any], after_func_args: tuple) -> str:
+    def add_task(cls, id: str, data: dict, after_func: typing.Union[None, typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str], typing.Any], typing.Any] ], after_func_args: tuple) -> str:
         """새로운 DB 작업을 추가하는 메서드
 
         Args:
@@ -35,9 +35,9 @@ class StatusManager():
 
             data (dict): DBMS 용 명령어 (Classes.Instruction.CreatInstruction)
 
-            after_func (typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str]], typing.Any]): 해당 작업이 완료 (status.done) 될 때 실행할 함수
+            after_func (typing.Union[None, typing.Callable[[tuple, typing.Union[None, bool], typing.Union[None, str], typing.Any], typing.Any] ]): None 또는 해당 작업이 완료 (status.done) 될 때 실행할 함수 
 
-            after_func_args (tuple): 해당 함수의 변수 
+            after_func_args (tuple): None 또는 after_func 함수의 변수 
         """
 
         new_task = Task(
@@ -67,7 +67,7 @@ class StatusManager():
         task.status = status
         task.result = result
         task.comment = comment
-        if task.status == "done":
+        if task.status == "done" and task.after_func != None:
             task.after_func(task.after_func_args, task.result, task.comment)
 
 
@@ -84,7 +84,7 @@ class QueueManager():
     def __init__(self) -> None:
         self.__task_queue = dict()
         self.__task_id_queue = dict()
-        for i in range(config.DBMS.task_thread_count):
+        for i in range(config.DBMS.task_thread_count): # 이 작업이 필요하기 때문에 __task_queue 와 __task_id_queue 를 클래스 변수로 선언하지 않음
             self.__task_queue.update({i: Queue()})
             self.__task_id_queue.update({i: list()})
 
@@ -113,7 +113,7 @@ class QueueManager():
         else:
             return False
 
-    def _get_smallest_queue(self) -> tuple[Queue, int]:
+    def _get_smallest_queue(self) -> typing.Tuple[Queue, int]:
         count = dict()
         for i in range(config.DBMS.task_thread_count):
             count.update({i: self.queue[i].qsize()})
@@ -122,6 +122,15 @@ class QueueManager():
 
         return self.queue[min_index], min_index
 
+
+    def _debug_get_jobs_in_each_queue_count(self) -> None:
+        """## DEBUG FUNC
+        - 각 큐에 있는 작업 개수와 총 작업 개수, 큐 개수 출력
+        - config.DEBUG가 True 일 경우에만 작동
+
+        """
+        if config.DEBUG:
+            print(f"EachQueueSize: {(task := [i.qsize() for i in self.queue.values()])} | TotalTaskCount: {sum(task)} | QueueCount: {config.DBMS.task_thread_count}")
 
 
     def put_task(self, id: str, data: dict) -> None:

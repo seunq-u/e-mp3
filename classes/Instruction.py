@@ -168,7 +168,7 @@ class CreateInstruction():
     def new_id(id: typing.Union[str, int]):
         return f'{id}?t={time.time()}'
 
-    def create_account(user_id: int, nickname: str, terms: tuple[bool, bool, bool]):
+    def create_account(user_id: int, nickname: str, terms: typing.Tuple[bool, bool, bool]):
         # 리턴으로 dict 형 data가 나옴
         data = {
             "Instruct" : Instruction.create_account,

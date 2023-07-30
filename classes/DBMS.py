@@ -11,6 +11,8 @@ It's manage files in/out and protecting from json encoder and decoder's error
 
 import dataclasses
 import copy
+import pprint
+import queue
 import time
 import typing
 import ujson
@@ -20,6 +22,14 @@ from multipledispatch import dispatch
 from queue import Queue
 from classes import Task
 import concurrent.futures
+
+
+class Counter:
+    COUNT = 0
+    TIME = int(time.time())
+
+global COUNTER
+COUNTER = Counter() 
 
 
 class DataManager():
@@ -38,9 +48,12 @@ class DataManager():
             cls.__QueueManager = Task.QueueManager()
             cls._isin = True
 
-            new_thread = threading.Thread(target=cls.update, name=f"DBMS", args=(cls._instance,))
+            new_thread_updater = threading.Thread(target=cls.update, name=f"DBMS", args=(cls._instance,))
             # new_thread.daemon = False # 메인 스레드가 종료되어도 I/O 작업은 계속하고 마침
-            new_thread.start()
+            new_thread_updater.start()
+            
+            if config.DEBUG:
+                threading.Thread(target=cls._debug_print_task_count, name=f"DBMS_COUNTER", args=( )).start()
 
             # cls.update(cls._instance) # multiprocessing
         return cls._instance
@@ -82,6 +95,7 @@ class DataManager():
             while self._isin:
                 for i in range(config.DBMS.task_thread_count):
                     if self.QueueManager.queue[i].qsize() != 0:
+                        # self.QueueManager._debug_get_jobs_in_each_queue_count()
                         data = self.QueueManager.get_task(thread_number=i)
 
                         # # 멀티 스레딩
@@ -92,9 +106,25 @@ class DataManager():
                         # 멀티 프로세싱
                         self.StatusManager.set_task(id = data.get('Identifier'), status='in progress')  
                         executor.submit(data.get('Instruct'), data)
-                        print(f'start threading / {data.get("InstructName")} / in thread.{i}. to {data.get("Identifier")}')
+                        # print(f'start threading / {data.get("InstructName")} / in thread.{i}. to {data.get("Identifier")}')
+                        
+                        # creat file / 1s
+                        if config.DEBUG and COUNTER.TIME == int(time.time()):
+                            COUNTER.COUNT += 1
+                        else:
+                            COUNTER.COUNT = 0
+                            COUNTER.TIME = int(time.time())
         # executor.shutdown()
 
+    def _debug_print_task_count():
+        while True: 
+            print(f"DBMS SPEED : {COUNTER.COUNT} file/s")
+
+            if COUNTER.TIME != int(time.time()):
+                COUNTER.COUNT = 0
+                COUNTER.TIME = int(time.time())
+
+            time.sleep(1)
 
 
 # test code

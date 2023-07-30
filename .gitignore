@@ -29,10 +29,10 @@ pip-delete-this-directory.txt
 *.pot
 
 # # Django stuff:
-# *.log
-# local_settings.py
-# db.sqlite3
-# db.sqlite3-journal
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -74,9 +74,9 @@ config.py
 .config
 .markdownlint.json
 
-# # log
-# *.log
-# logs/
+# log
+*.log
+logs/
 lavalink_logs/
 
 # 개인정보

@@ -88,9 +88,9 @@ class Logger:
         "info" : ('\033[92m', END_COLOR), # GREEN
         "warn" : ('\033[93m', END_COLOR), # YELLOW
         "error" : ('\033[91m', END_COLOR), # RED
-        "crit" : ('\033[5m\033[1m\033[4m\033[3m\033[31m', END_COLOR) # BOLD, BLINKING, UNDERLINE, ITALIC
+        "crit" : ('\033[5m\033[1m\033[4m\033[3m\033[31m', END_COLOR), # BOLD, BLINKING, UNDERLINE, ITALIC
+        "set" : ('\033[96m', END_COLOR) # CYAN
     }
-
 
 
 # <<--- DBMS --->>

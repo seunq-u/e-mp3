@@ -6,22 +6,28 @@ import config
 class Logger:
     _instance = None
     log_format = "{}{} / [{}] [{}]: {}{}"
+    level_type = ["debug", "info", "warn", "error", "crit", "set"]
 
     def _getTimeFormat():
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
-    def _log(log: str, level: Literal["debug", "info", "warn", "error", "crit"], name: str) -> None:
-        """(내부함수)"""
+
+    def _log(log: str, level: Literal["debug", "info", "warn", "error", "crit", "set"], name: str) -> None:
+        """(실제 LOG 출력 내부함수)"""
         print(Logger.log_format.format(config.Logger.log_color[level][0], (formated_time := Logger._getTimeFormat()), level.upper(), name, log, config.Logger.log_color[level][1]))
 
         if config.Logger.SaveLog: 
             Logger._save(msg = Logger.log_format.format('', formated_time, level.upper(), name, log, ''), level=level)
 
-    def _save(msg: str, level: Literal["debug", "info", "warn", "error", "crit"]):
-        if level == 'debug': FilePrefix = 'debug'
-        elif level == 'info': FilePrefix = 'info'
-        elif level == 'warn': FilePrefix = 'warn'
-        elif level == 'error' or level == 'crit' : FilePrefix = 'error'
+
+    def _save(msg: str, level: Literal["debug", "info", "warn", "error", "crit", "set"]):
+        """(로그 파일 저장 관리 내부함수)"""
+        if level in Logger.level_type:
+            FilePrefix = level
+        # if level == 'debug': FilePrefix = 'debug'
+        # elif level == 'info': FilePrefix = 'info'
+        # elif level == 'warn': FilePrefix = 'warn'
+        # elif level == 'error' or level == 'crit' : FilePrefix = 'error'
         else: FilePrefix = f'notSetLevel.{level}'
 
         time_text = datetime.now().strftime("%Y-%m-%d")
@@ -58,3 +64,7 @@ class Logger:
     def crit(log:str, name: str = config.NAME, detail: str = 'main'):
         """- 치명적인 오류 로그"""
         Logger._log(log=log, level='crit', name=f'{name}.{detail}')
+
+    def set(log:str, name: str = config.NAME, detail: str = 'main'):
+        """- 설정 기록 로그"""
+        Logger._log(log=log, level='set', name=f'{name}.{detail}')

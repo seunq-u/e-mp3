@@ -16,14 +16,21 @@
 
 - 모든 레벨의 파일이 모두 존재하지 않을 수도 있어요 ☺️
 
+- <`count`> 는 프로그램 몇 번 째 실행되었는지 표시하는 숫자예요.
+    </br>
+    1. 로그 별로 레벨 접두사 앞에 <`count`>_ 의 형식으로 붙어요.
+    2. e.g. `0_info_2023_09_17.log`
+    3. <`count`>는 `<int>.count` 파일을 통해서 관리 돼요
+
     ```bash
     E-MP3
     ├── logs
     │   └── yy-mm-dd
-    │       ├── debug_yy-mm-dd.log
-    │       ├── info_yy-mm-dd.log
-    │       ├── warn_yy-mm-dd.log
-    │       └── error_yy-mm-dd.log
+    │       ├── 0.count    
+    │       ├── <count>_debug_yy-mm-dd.log
+    │       ├── <count>_info_yy-mm-dd.log
+    │       ├── <count>_warn_yy-mm-dd.log
+    │       └── <count>_error_yy-mm-dd.log
     └── ...
     ```
 

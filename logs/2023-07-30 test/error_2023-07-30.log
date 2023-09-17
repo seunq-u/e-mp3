@@ -1,0 +1,8 @@
+2023-07-30 19:23:06.584 / [ERROR.0] [E-Mp3.main]: test log
+2023-07-30 19:23:07.402 / [ERROR.0] [E-Mp3.main]: test log
+2023-07-30 19:23:11.547 / [CRIT.0] [E-Mp3.main]: test log
+2023-07-30 19:23:12.119 / [CRIT.0] [E-Mp3.main]: test log
+2023-07-30 19:25:15.644 / [ERROR.0] [EP3BOT.terminal]: test log
+2023-07-30 19:25:19.688 / [CRIT.0] [EP3BOT.terminal]: test log
+2023-07-30 19:29:57.951 / [ERROR.0] [LoggerClass.MainCode]: test log from libs/Logger
+2023-07-30 19:29:59.136 / [CRIT.0] [LoggerClass.MainCode]: test log from libs/Logger

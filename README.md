@@ -5,10 +5,13 @@
     <body>
         <div align="center">
             <a href="https://discord.com/developers/docs/intro">
-                <img id="im" src="https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=Discord&logoColor=white" style="border-radius: 5%; object-fit: cover;"/>
+                <img id="im" src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=Discord&logoColor=white" style="border-radius: 5%; object-fit: cover;"/>
             </a>
             <a href="http://python.org">
-                <img id="im" src="https://img.shields.io/badge/Python 3.11-3776AB?style=flat-square&logo=Python&logoColor=white" style="border-radius: 5%; object-fit: cover;"/>
+                <img id="im" src="https://img.shields.io/badge/Python 3.11-3776AB?style=for-the-badge&logo=Python&logoColor=white" style="border-radius: 5%; object-fit: cover;"/>
+            </a>
+            <a href="https://github.com/Cog-Creators/Lavalink-Jars/releases/tag/3.7.8">
+                <img id="im" src="https://img.shields.io/badge/Lavalink%203.7.8-FF9900?style=for-the-badge&logo=applemusic&logoColor=FFFFFF" style="border-radius: 5%; object-fit: cover;"/>
             </a>
             <br></br>
             <img id="Profile" src="DB/image/e-mp3-bot-full-profile.png" style="border-radius: 25%; object-fit: cover; width: 80%; height: 80%; aspect-ratio: 1; box-shadow: 0px 0px 15px #a8a39c;">

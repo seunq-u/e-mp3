@@ -17,6 +17,7 @@ import lavalink
 import subprocess
 import time, sys
 import argparse
+from classes.Logger import Logger
 
 print(config.LOGO.MAIN)
 
@@ -27,20 +28,21 @@ Args = parser.parse_args()
 IS_LAVALINK = Args.lavalink
 if IS_LAVALINK:
     log_msg = f'{time.strftime("%x - %X")} / [\033[96mSET\033[0m] [{config.NAME}/SET]: \033[96mWithout starting lavalink.jar\033[0m'
-    print(log_msg)
+    Logger.set(log="Without starting lavalink.jar", detail="SET")
 
 
 DIR = os.path.abspath(os.path.join(os.path.realpath(__file__), os.pardir))
 
 try:
     if IS_LAVALINK:
-        print('waiting lavalink be started')
+        Logger.info(log='waiting lavalink be started', detail='lavalink')
         # os.system('start "Lavalink" /min lavalink.bat')
         proc_lavalink = subprocess.Popen(['lavalink.bat'], shell=False)
         time.sleep(5)
 
 except Exception as e:
     print('error: lavalink fail')
+    Logger.crit(log='lavalink load fail', detail='lavalink')
 
 
 # <<--- Auto Logger --->>
@@ -51,6 +53,7 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
 auto_logger.addHandler(stream_handler)
 global Lava
+
 # <<--- Class --->>
 class Bot(commands.AutoShardedBot):
     def __init__(self) -> None:
@@ -72,17 +75,18 @@ class Bot(commands.AutoShardedBot):
             if "__init__" in cog_list:
                 cog_list.remove("__init__")
             for i in cog_list:
-                print(f"{_dir.replace('/', '.')}.{i} 로드")
+                Logger.set(log=f"{_dir.replace('/', '.')}.{i} is loaded.", detail='setup_hook')
                 await self.load_extension(f"{_dir.replace('/', '.')}.{i}")
 
     async def on_ready(self):
-        print('Logged on as', self.user)
+        Logger.info(log=f'login as {self.user}')
         try:
             await self.tree.sync(guild=(discord.Object(id=config.DEV_GUILD)))
-            print('테스트 서버와 슬래시 명령어 동기화 성공')
+            Logger.info(log='테스트 서버와 슬래시 명령어 동기화 성공')
         except Exception as e:
-            print("테스트 서버와 슬래시 명령어 동기화 실패")
-            print(e)
+            Logger.warn(log="테스트 서버와 슬래시 명령어 동기화 실패")
+            Logger.warn(log=e)
+
         await activity(self=self)
 
     # async def on_voice_state_update(self, member, before, after):
@@ -96,9 +100,9 @@ async def activity(self):
         for i in act:
             await Client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f"{i}"), status=discord.Status.idle)
             try:
-                print(self.lavalink)
+                Logger.debug(log=self.lavalink)
             except:
-                print("err")
+                Logger.warn(log='NotFound self.lavalink')
             await asyncio.sleep(5)
 
 
@@ -107,7 +111,7 @@ async def main(Token: str, Client: any):
         try:
             await Client.start(token=Token)
         except Exception as e:
-            print("\n", e, "\n")
+            Logger.error(log=e)
 
 
 global Client
@@ -120,9 +124,9 @@ try:
     asyncio.run(main(Token=config.TOKEN, Client=Client))
     # Client.run(token=config.TOKEN)
 except KeyboardInterrupt:
-    print("Shutdown due to KeyboardInterrupt.")
+    Logger.info(log="Shutdown due to KeyboardInterrupt.")
 except Exception as e:
-    print(f'\n다음 에러로 봇이 실행되지 않았어요.\n-> {e}\n')
+    Logger.error(log=f'\n다음 에러로 봇이 실행되지 않았어요.\n-> {e}\n')
 
 proc_lavalink.terminate()
 

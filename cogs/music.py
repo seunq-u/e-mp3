@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord import app_commands
 import lavalink
 import re
+from classes.Logger import Logger
 # from lavalink.filters import Karaoke, Timescale, Tremolo, Vibrato, Rotation, LowPass, ChannelMix, Volume
 import config
 url_rx = re.compile(r'https?://(?:www\.)?.+')
@@ -48,14 +49,14 @@ async def ensure_voice(self, interaction: discord.Interaction) -> bool: # 에러
         player.store('text_channel_id', interaction.channel.id)
         try:
             await interaction.user.voice.channel.connect(cls=LavalinkVoiceClient, self_deaf=True)
-            print("연결됨1")
+            Logger.debug(log="연결됨1", detail='cogs.music.ensure_voice')
         except Exception as e:
             try:
                 await interaction.guild.voice_client.disconnect(force=True)
                 await interaction.user.voice.channel.connect(cls=LavalinkVoiceClient, self_deaf=True)
-                print("연결됨2")
+                Logger.debug(log="연결됨2", detail='cogs.music.ensure_voice')
             except Exception as e:
-                print(e)
+                Logger.error(log=f"{e}", detail='cogs.music.ensure_voice')
                 await interaction.followup.send("`❗ 연결중에 에러가 발생했어요..`")
                 return False
 
@@ -126,7 +127,7 @@ class LavalinkVoiceClient(discord.VoiceClient):
             try:
                 await bot_in_guild.edit(suppress = False)
             except Exception as e:
-                print(f'\t connect : {e}')
+                Logger.error(log=f"\t connect : {e}", detail='cogs.music.connect')
 
     async def disconnect(self, *, force: bool = False) -> None:
         """
@@ -148,7 +149,7 @@ class LavalinkVoiceClient(discord.VoiceClient):
         await player.reset_equalizer()
         self.cleanup()
         self.lavalink.player_manager.remove(self.channel.guild.id)
-        print('\t\t연결 끊김')
+        Logger.debug(log="\t\t연결 끊김", detail='cogs.music.disconnect')
 
 class Music(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -179,16 +180,16 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        print(f"\n\tvoice_state_update: {member}\n {before}\n->\n {after}\n")
+        Logger.debug(log=f"\n\tvoice_state_update: {member}\n {before}\n->\n {after}\n", detail='cogs.music.on_voice_state_update')
         try:
-            print(f" after members: len: {len(after.channel.members)} | {after.channel.members}\n\n")
+            Logger.debug(log=f" after members: len: {len(after.channel.members)} | {after.channel.members}\n\n", detail='cogs.music.on_voice_state_update')
         except:
-            print(f" before members: len : {len(before.channel.members)} | {before.channel.members}\n\n")
+            Logger.debug(log=f" before members: len : {len(before.channel.members)} | {before.channel.members}\n\n", detail='cogs.music.on_voice_state_update')
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"{__name__} loaded successfully!")
-    
+        Logger.set(log=f"{__name__} loaded successfully!", detail='cogs.music')
+
     @commands.Cog.listener()
     async def on_stage_instance_delete(self, stage_instance: discord.StageInstance):
         # 만약 스테이지 채널(stage channel)에 봇이 참여한 상태에 종료될 경우 플레이어(DefaultPlayer) 파괴
@@ -216,6 +217,8 @@ class Music(commands.Cog):
             # To save on resources, we can tell the bot to disconnect from the voicechannel.
             guild_id = event.player.guild_id
             guild = self.bot.get_guild(guild_id)
+            print("트랙 훅 연결 끊기 요청")
+
             await guild.voice_client.disconnect(force=True)
 
 
@@ -227,6 +230,7 @@ class Music(commands.Cog):
         """ Searches and plays a song from a given query. """
         if not await command_before_invoke(self=self, interaction=interaction):
             return None
+        player: lavalink.DefaultPlayer
 
         # 캐시로부터 재생 플레이어 얻기
         player = self.bot.lavalink.player_manager.get(interaction.guild.id)
@@ -239,7 +243,7 @@ class Music(commands.Cog):
             query = f'ytsearch:{query}'
 
         # lavalink 요청
-        
+
         results = await player.node.get_tracks(query)
 
         # Results could be None if Lavalink returns an invalid response (non-JSON/non-200 (OK)).
@@ -271,13 +275,12 @@ class Music(commands.Cog):
 
             player.add(requester=interaction.user.id, track=track)
 
-
         await interaction.followup.send(embed=embed)
-
 
         # 재생중이지 않는다면 재생 시작
         if not player.is_playing:
             await player.play()
+
 
     @app_commands.command(name="연결", description="🎤 음성 채널에 연결해요!")
     @app_commands.guilds(discord.Object(id=config.DEV_GUILD))
@@ -320,7 +323,7 @@ class Music(commands.Cog):
         try:
             await interaction.guild.voice_client.disconnect(force=True) # 또는 await interaction.voice_client.disconnect(force=True) | guild 권장
         except AttributeError as e:
-            print(e)
+            Logger.error(log=f"{e}", detail='cogs.music.연결끊기')
         finally:
             player.channel_id = None
             await interaction.followup.send('`📤 음성채널을 나갔어요.`')

@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord import app_commands
 from typing import Literal
 from libs import utilbox
-
+from classes.Logger import Logger
 import config
 
 
@@ -15,7 +15,7 @@ class e_mp3(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"{__name__} loaded successfully!")
+        Logger.set(log=f"{__name__} loaded successfully!", detail='cogs.e-mp3')
 
     # Admin
     @app_commands.command(name='sync', description='🍀 Sync Slash Command in <Bot Dev> guild. or <Option>')
@@ -59,17 +59,19 @@ class e_mp3(commands.Cog):
             if extension == "all":
                 for i in (extension := list(self.bot.cogs.keys())):
                     await self.bot.reload_extension(f"cogs.{i}")
-                    print(f"Reload Cogs: cogs.{i}.py")
+                    Logger.info(log=f"Reload Cogs: cogs.{i}.py", detail='cogs.e-mp3.reload')
             else:
                 await self.bot.reload_extension(f"cogs.{extension}")
-                print(f"Reload Cogs: cogs.{extension}.py")
+                Logger.info(log=f"Reload Cogs: cogs.{extension}.py", detail='cogs.e-mp3.reload')
+
         except Exception as e:
             try:
                 await interaction.response.send_message(content=f'`❌ cogs.{extension}.py 를 리로드중에 에러가 발생했어요.`\n-> ```{e}```')
             except discord.errors.InteractionResponded:
                 await interaction.edit_original_response(content=f'`❌ cogs.{extension}.py 를 리로드중에 에러가 발생했어요.`\n-> ```{e}```')
             except Exception as e:
-                print(e)
+                Logger.error(log=f"Reload: {e}", detail='cogs.e-mp3.reload')
+
         else:
             embed = discord.Embed(title=f'{config.Emoji.okay} Reload', description=f'{extension} successfully reloaded', color=0xff00c8).add_field( 
                     name='`⏱️ Runtime ⏱️`', 
@@ -87,7 +89,8 @@ class e_mp3(commands.Cog):
 
         try:
             await self.bot.unload_extension(f"cogs.{extension}")
-            print(f"Unload Cogs: cogs.{extension}.py")
+            Logger.info(log=f"Unload Cogs: cogs.{extension}.py", detail='cogs.e-mp3.unload')
+
             embed = discord.Embed(title=f'{config.Emoji.okay} Unload', description=f'{extension} successfully unload', color=0xff2626).add_field( 
                     name='`⏱️ Runtime ⏱️`', 
                     value=f'```py\n{datetime.datetime.now()-start_time}```', 
@@ -106,7 +109,7 @@ class e_mp3(commands.Cog):
 
         try:
             await self.bot.load_extension(f"cogs.{extension}")
-            print(f"Load Cogs: cogs.{extension}.py")
+            Logger.info(log=f"Load Cogs: cogs.{extension}.py", detail='cogs.e-mp3.load')
             embed = discord.Embed(title=f'{config.Emoji.okay} Load', description=f'{extension} successfully load', color=0x26ff7a).add_field( 
                     name='`⏱️ Runtime ⏱️`', 
                     value=f'```py\n{datetime.datetime.now()-start_time}```', 
@@ -121,13 +124,13 @@ class e_mp3(commands.Cog):
         if (iAd := utilbox.isAdmin(interaction)) is False:
             return await interaction.response.send_message(content=iAd)
 
-        print(f"SlashCommand -> ShutdownBot request is received from {interaction.user}({interaction.id})")
+        Logger.info(log=f"SlashCommand -> ShutdownBot request is received from {interaction.user}({interaction.id})", detail='cogs.e-mp3.shutdown')
         await interaction.response.send_message(content=f'`✔️ SHUTDOWN`')
         nodes = self.bot.lavalink.node_manager.available_nodes
         for i in nodes:
             # await i.destroy()
             self.bot.lavalink.node_manager.remove_node(node=i)
-            print(f'remove node - {i}')
+            Logger.info(log=f'remove node - {i}', detail='cogs.e-mp3.shutdown')
         await self.bot.close()
 
     @app_commands.command(description="📄 Get lavaink nodes and players info.")

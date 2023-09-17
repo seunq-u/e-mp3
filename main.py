@@ -18,6 +18,8 @@ import subprocess
 import time, sys
 import argparse
 
+print(config.LOGO.MAIN)
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--lavalink", action="store_true")
 

@@ -3,6 +3,8 @@ import os
 from typing import Literal
 import config
 
+raise("다음에 ONLY SAVE 기능 만들기")
+
 class Logger:
     _instance = None
     COUNT = False

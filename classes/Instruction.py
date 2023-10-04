@@ -25,7 +25,8 @@ class Instruction():
     def get_path_from_identifier(id: str) -> str:
         return id.split('?t=')[0]
 
-    def remove_identifier(func):
+    def rmv_fnc_in_dict(func):
+        # CreateInstruct의 함수 객체를 삭제
         def wrapper(data: dict, *args):
             data.pop("Instruct")
             return func(data, *args)
@@ -50,7 +51,7 @@ class Instruction():
         return True
 
     # <<--- 유저 명령 모음 --->>
-    @remove_identifier
+    @rmv_fnc_in_dict
     def create_account(data: dict, *args):
         id_removed_time = Instruction.get_path_from_identifier(id = data.get('Identifier'))
         if (result := FileIO.make_json(path="DB//user//", name=id_removed_time, data=data))[0]:
@@ -68,93 +69,93 @@ class Instruction():
             )
         return True
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def delete_account(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_nickname(data: dict, *args):
         return Instruction.alter_user(data=data)
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def add_kdbl_point(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_terms_pp(data: dict, *args):
         return Instruction.alter_user(data=data)
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_terms_tos(data: dict, *args):
         return Instruction.alter_user(data=data)
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_trems_mc(data: dict, *args):
         return Instruction.alter_user(data=data)
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def add_playlist(data: dict, *args):
         return Instruction.alter_user(data=data)
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def delete_playlist(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def add_bookmark(data: dict, *args):
         return Instruction.alter_user(data=data)
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def delete_bookmark(data: dict, *args):
         pass
 
 
     # 플리 명령 모음
-    @remove_identifier
+    @rmv_fnc_in_dict
     def create_playlist(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def remove_playlist(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_name(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_description(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_using_custom_cover_img(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_cover_img(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_visibility(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def add_music(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def remove_music(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def add_heart(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_dominant_color(data: dict, *args):
         pass
 
-    @remove_identifier
+    @rmv_fnc_in_dict
     def alter_background_type(data: dict, *args):
         "X"
         pass
@@ -165,15 +166,21 @@ class CreateInstruction():
     """
     # <<<--- user --->>>
 
-    def new_id(id: typing.Union[str, int]):
+    def crt_inst_idn(id: typing.Union[str, int]) -> str:
+        # 명령어 식별자 생성
         return f'{id}?t={time.time()}'
 
-    def create_account(user_id: int, nickname: str, terms: typing.Tuple[bool, bool, bool]):
+    def crt_df_dict(instruct: Instruction, instruct_name: str, id: typing.Union[str, int]) -> dict:
+        return {
+            "Instruct" : instruct,
+            "InstructName" : instruct_name,
+            "Identifier" : CreateInstruction.crt_inst_idn(id)
+            }
+
+    def create_account(user_id: int, nickname: str, terms: typing.Tuple[bool, bool, bool]) -> dict:
         # 리턴으로 dict 형 data가 나옴
-        data = {
-            "Instruct" : Instruction.create_account,
-            "InstructName" : 'create_account',
-            "Identifier" : CreateInstruction.new_id(user_id),
+        data : dict = CreateInstruction.crt_df_dict(Instruction.create_account, 'create_account', user_id)
+        data.update({
             "user_id" : user_id,
             "nickname" : nickname,
             "terms" : {
@@ -183,112 +190,95 @@ class CreateInstruction():
             },
             "playlist" : [ ],
             "bookmark" : [ ]
-        }
+        })
         return data
 
-    def delete_account():
+    def delete_account() -> dict:
         pass
 
-    def alter_nickname(user_id: int, nickname: str):
-        data = {
-            "Instruct" : Instruction.alter_nickname,
-            "InstructName" : 'alter_nickname',
-            "Identifier" : CreateInstruction.new_id(user_id),
-            "nickname" : nickname
-        }
+    def alter_nickname(user_id: int, nickname: str) -> dict:
+        data : dict = CreateInstruction.crt_df_dict(Instruction.alter_nickname, 'alter_nickname', user_id)
+        data.update({"nickname" : nickname})
         return data
 
-    def add_kdbl_point():
+    def add_kdbl_point() -> dict:
         pass
 
-    def alter_terms_pp(user_id: int, term_pp: bool):
-        data = {
-            "Instruct" : Instruction.alter_terms_pp,
-            "InstructName" : 'alter_terms_pp',
-            "Identifier" : CreateInstruction.new_id(user_id),
+    def alter_terms_pp(user_id: int, term_pp: bool) -> dict:
+        data : dict = CreateInstruction.crt_df_dict(Instruction.alter_terms_pp, 'alter_terms_pp', user_id)
+        data.update({
             "terms" : {
                 "policy_privacy" : term_pp,
             }
-        }
+        })
         return data
 
-    def alter_terms_tos(user_id: int, term_tos: bool):
-        data = {
-            "Instruct" : Instruction.alter_terms_tos,
-            "InstructName" : 'alter_terms_tos',
-            "Identifier" : CreateInstruction.new_id(user_id),
+    def alter_terms_tos(user_id: int, term_tos: bool) -> dict:
+        data : dict = CreateInstruction.crt_df_dict(Instruction.alter_terms_tos, 'alter_terms_tos', user_id)
+        data.update({
             "terms" : {
                 "terms_of_service" : term_tos,
             }
-        }
+        })
         return data
 
-    def alter_trems_mc(user_id: int, term_mc: bool):
-        data = {
-            "Instruct" : Instruction.alter_trems_mc,
-            "InstructName" : 'alter_trems_mc',
-            "Identifier" : CreateInstruction.new_id(user_id),
+    def alter_trems_mc(user_id: int, term_mc: bool) -> dict:
+        data : dict = CreateInstruction.crt_df_dict(Instruction.alter_trems_mc, 'alter_trems_mc', user_id)
+        data.update({
             "terms" : {
                 "marketing_consent" : term_mc
             }
-        }
+        })
         return data
 
-    def add_playlist(user_id: int, playlist_uuid: str):
-        data = {
-            "Instruct" : Instruction.add_playlist,
-            "InstructName" : 'add_playlist',
-            "Identifier" : CreateInstruction.new_id(user_id),
-            "playlist" : [playlist_uuid]
-        }
+    def add_playlist(user_id: int, playlist_uuid: str) -> dict:
+        data : dict = CreateInstruction.crt_df_dict(Instruction.add_playlist, 'add_playlist', user_id)
+        data.update({"playlist" : [playlist_uuid]})
         return data
 
-    def delete_playlist():
+    def delete_playlist() -> dict:
         pass
 
-    def add_bookmark(user_id: int, playlist_uuid: str):
-        data = {
-            "Instruct" : Instruction.add_bookmark,
-            "InstructName" : 'add_bookmark',
-            "Identifier" : CreateInstruction.new_id(user_id),
-            "bookmark" : [playlist_uuid]
-        }
+    def add_bookmark(user_id: int, playlist_uuid: str) -> dict:
+        data : dict = CreateInstruction.crt_df_dict(Instruction.add_bookmark, 'add_bookmark', user_id)
+        data.update({"bookmark" : [playlist_uuid]})
+
         return data
 
-    def delete_bookmark():
+    def delete_bookmark() -> dict:
         pass
 
     # <<<--- playlist --->>>
 
-    def create_playlist():
+    def create_playlist() -> dict:
         pass
 
-    def remove_playlist():
+    def remove_playlist() -> dict:
         pass
 
-    def alter_name():
+    def alter_name() -> dict:
         pass
 
-    def alter_description():
+    def alter_description() -> dict:
         pass
 
-    def alter_using_custom_cover_img():
+    def alter_using_custom_cover_img() -> dict:
         pass
 
-    def alter_cover_img():
+    def alter_cover_img() -> dict:
         pass
 
-    def alter_visibility():
+    def alter_visibility() -> dict:
         pass
 
-    def add_music():
+    def add_music() -> dict:
         pass
 
-    def alter_muisc():
+    def alter_muisc() -> dict:
         pass
 
-    def remove_music():
+    def remove_music() -> dict:
         pass
 
-    def add_heart():
+    def add_heart() -> dict:
         pass

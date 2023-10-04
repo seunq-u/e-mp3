@@ -40,11 +40,12 @@ class DataManager():
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            Logger.info('Creating new instance', detail='instance')
+            Logger.set('Creating new DBMS instance', detail='DBMS.instance')
+            
             cls._instance = cls.__new__(cls)
             cls._startTime = time.time()
             cls.__running = True
-            Logger.info(f'Starting DBMS <{cls.__running=}, {cls._startTime=}>', detail='instance')
+            Logger.info(f'Starting DBMS <{cls.__running=}, {cls._startTime=}>', detail='DBMS.instance')
 
             cls.__StatusManager = Task.StatusManager()
             cls.__QueueManager = Task.QueueManager()
@@ -97,7 +98,7 @@ class DataManager():
 
 
     def update(self, *args):
-        Logger.info('Start DBMS.update()')
+        Logger.info('Start DBMS.update()', detail="DBMS.update")
         with concurrent.futures.ThreadPoolExecutor() as executor:
             while True:
                 if not self.running: executor.shutdown(); break
@@ -134,7 +135,7 @@ class DataManager():
         """
         shutdown_thread = threading.Thread(target=self.__shutdown_worker, name=f"ShutdownWorker?t={time.time()}", args=(self, ))
         shutdown_thread.daemon = False
-        Logger.info('waiting DBMS shutdown...', name='DBMS', detail='stop')
+        Logger.warn('Waiting for DBMS shutdown...', name='DBMS', detail='stop')
         shutdown_thread.start()
 
     def __shutdown_worker(self, *args):
@@ -142,10 +143,10 @@ class DataManager():
         """
         waiting_time = 0.0
         while True:
-            Logger.info(f'waiting DBMS shutdown... for {waiting_time:.1f}s', name='DBMS', detail='__shutdown_worker.daemonThread')
+            Logger.warn(f'Waiting for all DBMS works are finished... for {waiting_time:.1f}s', name='DBMS', detail='__shutdown_worker.daemonThread')
             if self.QueueManager.get_current_tasks_count() == 0:
                 self.running = False
-                Logger.info(f'DBMS is shutdowned...', name='DBMS', detail='__shutdown_worker.daemonThread')
+                Logger.info(f'DBMS shutdown successful...', name='DBMS', detail='__shutdown_worker.daemonThread')
 
                 break
 

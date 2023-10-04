@@ -201,6 +201,8 @@ if __name__ == '__main__':
             # pprint.pprint([i.queue for i in DBMS.QueueManager.queue.values()])
             time.sleep(1.2)
             pprint.pprint(DBMS.StatusManager.get_task(put_data.get('Identifier')))
+        time.sleep(3)
+        DBMS.stop()
 
     elif WHAT == W.MassiveQueueJobs:
         aft_func = None
